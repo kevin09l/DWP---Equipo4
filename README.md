@@ -28,7 +28,26 @@ Permitiendo informar de manera rápida y directa.
 
 ## 🛠️ Tecnologías (pendiente)
 
-## 📁 Estructura (pendiente)
+**Frontend**
+-[]
+**Backend**
+-[]
+
+## 📁 Estructura
+
+app-web/
+├── backend/
+|
+├── database/
+|
+├── docs/
+| ├── architecture/
+| ├── adr/
+├── frontend/
+|
+├── docker-compose.yml
+├── Dockerfile
+├── README.md
 
 ## 📍 Prerrequisitos
 
