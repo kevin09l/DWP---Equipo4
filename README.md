@@ -6,8 +6,8 @@ Aplicación web para abordar la **escasez y cortes frecuentes de agua** en comun
 
 ## 🎯 Objetivo
 
-Gestionar de manera automatizada, mediante la aplicación web como medio de comunicación y organización.
-Permitiendo informar de manera rápida y directa.
+Gestionar de manera automatizada el suministro de agua, mediante la aplicación web como medio de comunicación y organización.
+Permitiendo informar de manera rápida y directa a los ciudadanos de comunidades o ciudades pequeñas.
 
 ## 👤 Usuarios
 
@@ -19,9 +19,11 @@ Permitiendo informar de manera rápida y directa.
 ## 📌 Funcionalidades Principales
 
 - Registro e inicio de sesión de usuarios
-- Alertas sobre cortes programados/emergentes
+- Alertas o avisos sobre cortes programados/emergentes
 - Reporte de incidencias (fugas, baja presión)
 - Gestión de horarios de suministro
+- Gestión de reportes de incidencias
+- Gestión de avisos o alertas
 - Dashboard de estadísticas
 
 ## 📁 Estructura
