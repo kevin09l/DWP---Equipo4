@@ -1,38 +1,35 @@
 import { useNavigate } from "react-router-dom";
-import KeyboardNav from "../../components/KeyboardNav";
-
-
-const routes = [
-"/",
-"/register",
-"/home",
-"/reports",
-"/status",
-"/notifications",
-"/schedule",
-"/tips",
-];
-
 
 export default function Login() {
-const navigate = useNavigate();
+  const navigate = useNavigate();
 
+  return (
+    <div>
+      <h1>Iniciar Sesión</h1>
 
-return (
-<div>
-<KeyboardNav routes={routes} currentIndex={0} />
+      <div>
+        <label>Usuario o correo</label>
+        <br />
+        <input type="text" />
+      </div>
 
+      <br />
 
-<h1>Inicio de Sesión</h1>
+      <div>
+        <label>Contraseña</label>
+        <br />
+        <input type="password" />
+      </div>
 
+      <br />
 
-<input placeholder="Correo" />
-<br />
-<input placeholder="Contraseña" type="password" />
-<br />
+      <button onClick={() => navigate("/home")}>
+        Iniciar sesión
+      </button>
 
-<button onClick={() => navigate("/home")}>Ingresar</button>
-<button onClick={() => navigate("/register")}>Registrarse</button>
-</div>
-);
+      <button onClick={() => navigate("/register")}>
+        Registrarse
+      </button>
+    </div>
+  );
 }
