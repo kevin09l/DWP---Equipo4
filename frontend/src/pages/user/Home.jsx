@@ -25,9 +25,12 @@ return (
 
 <h1>Pantalla Inicio</h1>
 
-
+<button onClick={() => navigate("/Login")}>iniciar sesion</button>
+<button onClick={() => navigate("/home")}>inicio</button>
 <button onClick={() => navigate("/reports")}>Reportes</button>
-<button onClick={() => navigate("/status")}>Status del Reporte</button>
+<button onClick={() => navigate("/notifications")}>Avisos</button>
+<button onClick={() => navigate("/schedule")}>horarios</button>
+<button onClick={() => navigate("/tips")}>Consejos</button>
 </div>
 );
 }
