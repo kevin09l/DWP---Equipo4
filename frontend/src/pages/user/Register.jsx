@@ -35,7 +35,7 @@ return (
 <br />
 
 
-<button onClick={() => navigate("/")}>Volver Login</button>
+<button onClick={() => navigate("/Login")}>Volver Login</button>
 <button onClick={() => navigate("/home")}>Crear Cuenta</button>
 </div>
 );
