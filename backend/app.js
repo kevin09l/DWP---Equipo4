@@ -22,7 +22,8 @@ app.use(
       const allowed = process.env.FRONTEND_URL || '';
       const isLocal517 = origin.startsWith('http://localhost:517');
       const isLocal3010 = origin.startsWith('http://localhost:3010');
-      if (origin === allowed || isLocal517 || isLocal3010) {
+      const isRailway = origin.startsWith('https://dwp-equipo4-production.up.railway.app');
+      if (origin === allowed || isLocal517 || isLocal3010 || isRailway) {
         return callback(null, true);
       }
       console.warn('CORS blocked origin', origin);
