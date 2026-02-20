@@ -1,60 +1,40 @@
-
 services:
-  frontend:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    container_name: frontend-dev
-    ports:
-      - "5173:5173" 
-    volumes:
-      - ./frontend:/app       
-      - /app/node_modules      
-    environment:
-      - VITE_PORT=5173
-      - CHOKIDAR_USEPOLLING=true 
-      # during development we proxy /api to backend; keep base url relative
-      - VITE_API_BASE_URL=/api
-      # tell vite dev server how to reach backend from inside container
-      - VITE_PROXY_TARGET=http://backend:3010
-    stdin_open: true           
-    tty: true
-    depends_on:
-      - backend
-
-  backend:
-    build:
-      context: ./backend
-      dockerfile: Dockerfile
-    container_name: backend-dev
-    ports:
-      - "3010:3010"
-    environment:
-      - DB_HOST=mysql-dev
-      - DB_PORT=3306
-      - DB_USER=root
-      - DB_PASSWORD=root
-      - DB_NAME=dwp4_app
-      # secrets for JWT (replace with strong values in production)
-      - JWT_ACCESS_SECRET=supersecretaccess
-      - JWT_REFRESH_SECRET=supersecretrefresh
-      - ACCESS_EXPIRES=15m
-      - REFRESH_EXPIRES=7d
-      - FRONTEND_URL=http://localhost:5173
-    depends_on:
-      - mysql
-
   mysql: 
-    image: mysql:latest
+    image: mysql:8.0
     container_name: mysql-dev
     restart: always
     environment:
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: dwp4_app
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+      MYSQL_DATABASE: ${DB_NAME}
     ports:
-      - "3309:3306"
+      - "3306:3306"
     volumes:
       - mysql-data:/var/lib/mysql
       - ./database/schema.sql:/docker-entrypoint-initdb.d/schema.sql
+
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${DB_PASSWORD}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: fullstack-app
+
+    depends_on:
+      mysql:
+        condition: service_healthy
+    ports:
+      - "${PORT}:${PORT}" 
+    environment:
+      - DB_HOST=mysql
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_NAME=${DB_NAME}
+      - PORT=${PORT}
+
 volumes:
   mysql-data:
