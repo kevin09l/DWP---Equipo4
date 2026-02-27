@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "../../styles/styles.css";
 import Loader from "../../components/Loader";
@@ -10,55 +10,71 @@ export default function AdminLogin() {
   const userRef = useRef(null);
   const passwordRef = useRef(null);
 
+  const headingRef = useRef(null);
+
   const [user, setUser] = useState("");
   const [password, setPassword] = useState("");
   const [errors, setErrors] = useState({});
-  const [mensajeError, setMensajeError] = useState("");
+  const [mensaje, setMensaje] = useState(""); 
   const [loading, setLoading] = useState(false);
+  const [esExito, setEsExito] = useState(false); 
+
+
+  useEffect(() => {
+    headingRef.current?.focus();
+  }, []);
 
   const validar = () => {
     const nuevosErrores = {};
-
-    if (!user.trim()) {
-      nuevosErrores.user = "El usuario es obligatorio";
-    }
-
-    if (!password.trim()) {
-      nuevosErrores.password = "La contraseña es obligatoria";
-    }
-
+    if (!user.trim()) nuevosErrores.user = "El usuario es obligatorio";
+    if (!password.trim()) nuevosErrores.password = "La contraseña es obligatoria";
     return nuevosErrores;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     const validacion = validar();
 
     if (Object.keys(validacion).length > 0) {
       setErrors(validacion);
-      setMensajeError("Todos los campos son obligatorios.");
+      setEsExito(false);
+      setMensaje("Revisa los campos obligatorios.");
+      
 
-      if (validacion.user) {
-        userRef.current?.focus();
-      } else if (validacion.password) {
-        passwordRef.current?.focus();
-      }
-
+      if (validacion.user) userRef.current?.focus();
+      else if (validacion.password) passwordRef.current?.focus();
       return;
     }
 
     setErrors({});
-    setMensajeError("");
+    setMensaje("");
     setLoading(true);
 
     try {
       const data = await auth.login({ email: user, password });
+      
+
+      setEsExito(true);
+      setMensaje("¡Acceso concedido! Entrando al panel...");
+      
       localStorage.setItem("admin", "true");
-      navigate("/admin/dashboard");
+
+
+      setTimeout(() => {
+        navigate("/admin/dashboard");
+      }, 1500);
+
     } catch (err) {
       console.error(err);
-      setMensajeError(err.message || "Error al iniciar sesión");
+      setEsExito(false);
+      
+      if (!window.navigator.onLine) {
+        setMensaje("Sin conexión a internet.");
+      } else if (err.message.includes("Network Error") || err.message.includes("fetch")) {
+        setMensaje("Error de red: No se pudo conectar con el servidor.");
+      } else {
+        setMensaje(err.message || "Credenciales de administrador incorrectas.");
+      }
     } finally {
       setLoading(false);
     }
@@ -66,46 +82,42 @@ export default function AdminLogin() {
 
   return (
     <div className="admin-login-page">
-      <div
-        className="admin-login-card"
-        aria-busy={loading}
-      >
+      <div className="admin-login-card" aria-busy={loading}>
         <div className="admin-login-header">
-          <h2>Inicio de sesión administrador</h2>
+
+          <h2 ref={headingRef} tabIndex="-1" style={{ outline: 'none' }}>
+            Inicio de sesión administrador
+          </h2>
         </div>
 
-        {mensajeError && (
-          <div role="alert" aria-live="assertive" className="error-message">
-            {mensajeError}
+
+        {mensaje && (
+          <div 
+            className={esExito ? "success-message-container" : "form-alert"} 
+            role="alert" 
+            aria-live="assertive"
+          >
+            {mensaje}
           </div>
         )}
 
         <form onSubmit={handleSubmit} noValidate>
-
           <div className="form-group">
             <label htmlFor="admin-user">Usuario</label>
             <input
               ref={userRef}
               id="admin-user"
               type="text"
-              placeholder="admin"
+              placeholder="admin@ejemplo.com"
               value={user}
               onChange={(e) => {
                 setUser(e.target.value);
-                if (errors.user) {
-                  setErrors({ ...errors, user: undefined });
-                }
+                if (errors.user) setErrors({ ...errors, user: undefined });
               }}
               aria-invalid={!!errors.user}
-              aria-describedby={errors.user ? "admin-user-error" : undefined}
               className={errors.user ? "input-error" : ""}
             />
-
-            {errors.user && (
-              <p id="admin-user-error" className="error-message">
-                {errors.user}
-              </p>
-            )}
+            {errors.user && <p className="error-message">{errors.user}</p>}
           </div>
 
           <div className="form-group">
@@ -118,20 +130,12 @@ export default function AdminLogin() {
               value={password}
               onChange={(e) => {
                 setPassword(e.target.value);
-                if (errors.password) {
-                  setErrors({ ...errors, password: undefined });
-                }
+                if (errors.password) setErrors({ ...errors, password: undefined });
               }}
               aria-invalid={!!errors.password}
-              aria-describedby={errors.password ? "admin-password-error" : undefined}
               className={errors.password ? "input-error" : ""}
             />
-
-            {errors.password && (
-              <p id="admin-password-error" className="error-message">
-                {errors.password}
-              </p>
-            )}
+            {errors.password && <p className="error-message">{errors.password}</p>}
           </div>
 
           <button
@@ -139,9 +143,14 @@ export default function AdminLogin() {
             className="btn-admin-login"
             disabled={loading}
           >
-            {loading ? <Loader message="Iniciando sesión..." /> : "Iniciar sesión"}
+            {loading ? (
+              <span aria-live="polite">
+                <Loader message="Autenticando..." />
+              </span>
+            ) : (
+              "Iniciar sesión"
+            )}
           </button>
-
         </form>
       </div>
     </div>

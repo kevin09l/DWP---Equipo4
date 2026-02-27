@@ -14,6 +14,7 @@ export default function Login() {
   const [errorPassword, setErrorPassword] = useState(false);
   const [mensajeError, setMensajeError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [esExito, setEsExito] = useState(false);
 
   const manejarLogin = async () => {
     // basic client validation
@@ -45,11 +46,23 @@ export default function Login() {
     try {
       const data = await auth.login({ email: usuario, password });
       // success: store token, user etc. backend returns user.name
+      setEsExito(true);
+      setMensajeError("¡Bienvenido! Iniciando sesión...");
+
       localStorage.setItem("user", data.user?.name || usuario);
-      navigate("/home");
+      setTimeout(() => {
+        navigate("/home");
+      }, 1500);
     } catch (err) {
       console.error(err);
-      setMensajeError(err.message || "Error al iniciar sesión");
+      setEsExito(false);
+      if (!window.navigator.onLine) {
+        setMensajeError("Sin conexión a internet. Verifique su red.");
+      } else if (err.message.includes("Network Error") || err.message.includes("fetch")) {
+        setMensajeError("Error de red: No se pudo conectar con el servidor.");
+      } else {
+        setMensajeError(err.message || "Error al iniciar sesión");
+      }
     } finally {
       setLoading(false);
     }
@@ -74,7 +87,8 @@ export default function Login() {
         }}
         noValidate> 
         {mensajeError && (
-          <p className="error-message" role="alert">
+          <p className={esExito ? "success-message-container" : "form-alert"} role="alert" 
+            aria-live="assertive">
             {mensajeError}
           </p>
         )}
@@ -140,9 +154,9 @@ export default function Login() {
             disabled={loading}
           >
             {loading ? (
-              <>
-                <Loader message="Iniciando sesión..." />
-              </>
+              <span aria-live="polite">
+                  <Loader message="Iniciando sesión..." />
+              </span>
             ) : (
               "Iniciar sesión"
             )}

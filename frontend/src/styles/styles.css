@@ -7,6 +7,10 @@ html, body {
 * {
   box-sizing: border-box;
 }
+.login-page, .register-page, .reports-page, .home-page, .error-page, .schedule-page, .notifications-page, .tips-page {
+  animation: transitionIn 0.5s ease-out;
+  will-change: opacity, transform; 
+}
 
 /* ===== REGISTER ===== */
 .register-page {
@@ -55,6 +59,30 @@ html, body {
   border-radius: 6px;
 }
 
+.success-message-container {
+  background-color: #ecfdf5; 
+  border-left: 4px solid #10b981; 
+  padding: 12px;
+  margin-bottom: 20px;
+  border-radius: 4px;
+  color: #065f46; 
+  font-size: 14px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  animation: slideInDown 0.4s ease-out;
+}
+@keyframes slideInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
 /* FORMULARIO */
 .form-group {
   display: flex;
@@ -71,6 +99,7 @@ html, body {
   padding: 8px;
   border-radius: 6px;
   border: 1px solid #d1d5db;
+  transition: border-color 0.2s, box-shadow 0.2s;
 }
 
 /* FILA DE CONTRASEÑAS */
@@ -100,10 +129,21 @@ html, body {
   padding: 10px 26px;
   border-radius: 6px;
   cursor: pointer;
+  transition: background-color 0.2s ease;
+  will-change: background-color;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .btn-register:hover {
   background-color: #1d4ed8;
+}
+
+.btn-register:disabled {
+  background-color: #94a3b8;
+  cursor: not-allowed;
+  opacity: 0.7;
 }
 
 /* ===== LOGIN (DISEÑO FINAL) ===== */
@@ -189,6 +229,7 @@ html, body {
 }
 
 .spinner {
+  will-change: transform;
   width: 1rem;
   height: 1rem;
   border: 2px solid #cbd5e1;
@@ -1326,6 +1367,7 @@ select:focus-visible {
   color: #dc2626;
   font-size: 13px;
   margin-top: 4px;
+  animation: slideInError 0.3s ease-out;
 }
 
 /* Focus accesible */
@@ -1408,4 +1450,29 @@ button:disabled {
   10% { opacity: 1; transform: translateY(0); }
   90% { opacity: 1; }
   100% { opacity: 0; transform: translateY(-10px); }
+}
+@keyframes slideInError {
+  from { opacity: 0; transform: translateY(-5px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes transitionIn {
+  from {
+    opacity: 0;
+    transform: translateY(5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+/*prefers reduce motion*/
+@media (prefers-reduced-motion: reduce) {
+  .spinner {
+    animation: none !important;
+    border-top-color: #f59e0b;
+  }
+  
+  .error-message {
+    animation: none !important;
+  }
 }

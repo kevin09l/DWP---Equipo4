@@ -20,6 +20,7 @@ export default function Register() {
   const [errors, setErrors] = useState({});
   const [mensaje, setMensaje] = useState("");
   const [loading, setLoading] = useState(false);
+  const [esExito, setEsExito] = useState(false);
 
   useEffect(() => {
     headingRef.current?.focus();
@@ -62,6 +63,7 @@ export default function Register() {
 
     if (Object.keys(validacion).length > 0) {
       setErrors(validacion);
+      setEsExito(false);
       setMensaje("Revisa los errores del formulario.");
       return;
     }
@@ -72,11 +74,21 @@ export default function Register() {
 
     try {
       const data = await auth.register(form);
+      setEsExito(true);
+      setMensaje("¡Registro exitoso! Redirigiendo...");
+      setTimeout(() => {
       localStorage.setItem("user", form.nombre);
       navigate("/home");
+    }, 1500);
     } catch (err) {
       console.error(err);
-      setMensaje(err.message || "Error al registrar");
+    if (!window.navigator.onLine) {
+        setMensaje("Sin conexión a internet. Verifica tu red.");
+      } else if (err.message.includes("Network Error") || err.message.includes("fetch")) {
+        setMensaje("Error de red: No se pudo conectar con el servidor.");
+      } else {
+        setMensaje(err.message || "Error al registrar la cuenta.");
+      }
     } finally {
       setLoading(false);
     }
@@ -102,7 +114,7 @@ export default function Register() {
         </div>
 
         {mensaje && (
-          <div role="alert" aria-live="assertive">
+          <div role="alert" aria-live="assertive" className={esExito ? "success-message-container" : "form-alert"}>
             {mensaje}
           </div>
         )}
@@ -118,12 +130,11 @@ export default function Register() {
               onChange={(e) =>
                 setForm({ ...form, nombre: e.target.value })
               }
+              className={errors.email ? "input-error" : ""}
               aria-invalid={!!errors.nombre}
               aria-describedby={errors.nombre ? "nombre-error" : undefined}
             />
-            {errors.nombre && (
-              <p id="nombre-error">{errors.nombre}</p>
-            )}
+            {errors.nombre && <p className="error-message" id="nombre-error">{errors.nombre}</p>}
           </div>
 
           <div className="form-group">
@@ -135,12 +146,11 @@ export default function Register() {
               onChange={(e) =>
                 setForm({ ...form, email: e.target.value })
               }
+              className={errors.email ? "input-error" : ""}
               aria-invalid={!!errors.email}
               aria-describedby={errors.email ? "email-error" : undefined}
             />
-            {errors.email && (
-              <p id="email-error">{errors.email}</p>
-            )}
+            {errors.email && <p className="error-message" id="email-error">{errors.email}</p>}
           </div>
 
           <div className="form-group">
@@ -152,12 +162,11 @@ export default function Register() {
               onChange={(e) =>
                 setForm({ ...form, direccion: e.target.value })
               }
+              className={errors.email ? "input-error" : ""}
               aria-invalid={!!errors.direccion}
               aria-describedby={errors.direccion ? "direccion-error" : undefined}
             />
-            {errors.direccion && (
-              <p id="direccion-error">{errors.direccion}</p>
-            )}
+            {errors.direccion && <p className="error-message">{errors.direccion}</p>}
           </div>
 
           <div className="form-group">
@@ -169,12 +178,11 @@ export default function Register() {
               onChange={(e) =>
                 setForm({ ...form, medidor: e.target.value })
               }
+              className={errors.email ? "input-error" : ""}
               aria-invalid={!!errors.medidor}
               aria-describedby={errors.medidor ? "medidor-error" : undefined}
             />
-            {errors.medidor && (
-              <p id="medidor-error">{errors.medidor}</p>
-            )}
+            {errors.medidor && <p className="error-message">{errors.medidor}</p>}
           </div>
 
           <div className="form-row">
@@ -187,12 +195,11 @@ export default function Register() {
                 onChange={(e) =>
                   setForm({ ...form, password: e.target.value })
                 }
+                className={errors.email ? "input-error" : ""}
                 aria-invalid={!!errors.password}
                 aria-describedby={errors.password ? "password-error" : undefined}
               />
-              {errors.password && (
-                <p id="password-error">{errors.password}</p>
-              )}
+              {errors.password && <p className="error-message">{errors.password}</p>}
             </div>
 
             <div className="form-group">
@@ -204,12 +211,11 @@ export default function Register() {
                 onChange={(e) =>
                   setForm({ ...form, confirm: e.target.value })
                 }
+                className={errors.email ? "input-error" : ""}
                 aria-invalid={!!errors.confirm}
                 aria-describedby={errors.confirm ? "confirm-error" : undefined}
               />
-              {errors.confirm && (
-                <p id="confirm-error">{errors.confirm}</p>
-              )}
+              {errors.confirm && <p className="error-message">{errors.confirm}</p>}
             </div>
           </div>
 
@@ -237,7 +243,9 @@ export default function Register() {
               className="btn-register"
               disabled={loading}
             >
-              {loading ? <Loader message="Registrando..." /> : "Registrarse"}
+              {loading ? <span aria-live="polite">
+                  <Loader message="Registrando..." />
+                </span> : "Registrarse"}
             </button>
           </div>
 
