@@ -11,14 +11,17 @@ export const register = async (data) => {
         throw new ApiError(400, "Todos los campos son obligatorios");
     }
 
-    const existingEmail = await authModel.findByEmail(email);
-    if (existingEmail) {
-        throw new ApiError(400, "El correo ya está registrado");
-    }
-
-    const existingMeter = await authModel.findByWaterMeter(water_meter);
-    if (existingMeter) {
-        throw new ApiError(400, "El medidor ya está registrado");
+    // do a single query to detect conflicts (email or water meter)
+    const conflictUser = await authModel.findByEmailOrMeter(email, water_meter);
+    if (conflictUser) {
+        if (conflictUser.email === email) {
+            throw new ApiError(400, "El correo ya está registrado");
+        }
+        if (conflictUser.water_meter === water_meter) {
+            throw new ApiError(400, "El medidor ya está registrado");
+        }
+        // in case both match (shouldn't happen due to uniques) just throw generic
+        throw new ApiError(400, "Usuario ya existe");
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);

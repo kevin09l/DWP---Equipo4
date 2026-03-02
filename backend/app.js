@@ -14,6 +14,10 @@ const app = express();
 // allow our frontend origin and send cookies for auth (refresh token)
 // NB: vite sometimes picks a different port (5173, 5174, …) so we allow
 // any localhost:517x address and also permit a custom FRONTEND_URL via env.
+import { responseTime } from "./middlewares/responseTime.middleware.js";
+
+app.use(responseTime);
+
 app.use(
   cors({
     origin: (origin, callback) => {
@@ -37,6 +41,11 @@ app.use(cookieParser());
 
 app.use("/api/auth", authRoutes);
 
+// any other /api path that wasn't matched should return 404 JSON
+app.use("/api", (req, res) => {
+  res.status(404).json({ success: false, message: "Endpoint no encontrado" });
+});
+
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.get(/^(?!\/api).+/, (req, res) => {
@@ -58,8 +67,11 @@ console.log("Inicio del servidor con variables:", {
   FRONTEND_URL: process.env.FRONTEND_URL,
 });
 
-app.listen(PORT, () => {
-    console.log(`Servidor corriendo en puerto ${PORT}`);
-});
+// only start listening when not testing; tests can import app and run custom server
+if (process.env.NODE_ENV !== 'test') {
+  app.listen(PORT, () => {
+      console.log(`Servidor corriendo en puerto ${PORT}`);
+  });
+}
 
 export default app;

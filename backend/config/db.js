@@ -13,17 +13,20 @@ const pool = mysql.createPool({
     queueLimit: 0
 });
 
-(async () => {
-    const host = process.env.DB_HOST || "localhost";
-    const port = process.env.DB_PORT || 3306;
-    try {
-        const connection = await pool.getConnection();
-        console.log(`Conectado a MySQL en ${host}:${port}`);
-        connection.release();
-    } catch (error) {
-        console.error(`Error conectando a MySQL en ${host}:${port}:`, error);
-    }
-})();
+// during tests we don't want to hit a real database
+if (process.env.NODE_ENV !== 'test') {
+    (async () => {
+        const host = process.env.DB_HOST || "localhost";
+        const port = process.env.DB_PORT || 3306;
+        try {
+            const connection = await pool.getConnection();
+            console.log(`Conectado a MySQL en ${host}:${port}`);
+            connection.release();
+        } catch (error) {
+            console.error(`Error conectando a MySQL en ${host}:${port}:`, error);
+        }
+    })();
+}
 
 
 export default pool;

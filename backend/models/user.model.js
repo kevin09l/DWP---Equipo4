@@ -8,6 +8,15 @@ export const findByEmail = async (email) => {
     return rows[0];
 };
 
+// return a user if either email or water meter matches; used to reduce two round trips
+export const findByEmailOrMeter = async (email, waterMeter) => {
+    const [rows] = await db.query(
+        "SELECT * FROM users WHERE email = ? OR water_meter = ? LIMIT 1",
+        [email, waterMeter]
+    );
+    return rows[0];
+};
+
 export const findByWaterMeter = async (waterMeter) => {
     const [rows] = await db.query(
         "SELECT * FROM users WHERE water_meter = ?",
