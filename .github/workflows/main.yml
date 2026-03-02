@@ -55,7 +55,7 @@ jobs:
       # Build Docker
 
       - name: Build Docker images
-        run: docker build - t fullstack-app .
+        run: docker build -t fullstack-app .
 
       - name: Start containers
         run: docker-compose up -d
