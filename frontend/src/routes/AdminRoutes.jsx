@@ -1,6 +1,5 @@
 import { Routes, Route } from "react-router-dom";
 
-import AdminLogin from "../pages/admin/AdminLogin";
 import Dashboard from "../pages/admin/Dashboard";
 import CrudSchedules from "../pages/admin/CrudSchedules";
 import CrudAnnouncements from "../pages/admin/CrudAnnouncements";
@@ -11,7 +10,6 @@ import AdminLayout from "../layouts/AdminLayout";
 export default function AdminRoutes() {
   return (
     <Routes>
-      <Route index element={<AdminLogin />} />
 
       <Route element={<AdminLayout />}>
         <Route path="dashboard" element={<Dashboard />} />
