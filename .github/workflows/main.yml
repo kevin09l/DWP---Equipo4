@@ -47,12 +47,16 @@ jobs:
       - name: Start containers with Fallback Env
         run: docker compose up -d --build
         env:
-          JWT_SECRET: ${{ secrets.JWT_SECRET || 'clave_temporal_para_ci' }}
+          # Definimos
+          PORT: 3010
+          # Secretos con valores fallback para que el CI pase sin errores
+          JWT_SECRET: ${{ secrets.JWT_SECRET || 'clave_temporal_ci' }}
+          JWT_ACCESS_SECRET: ${{ secrets.JWT_ACCESS_SECRET || 'access_test_123' }}
+          JWT_REFRESH_SECRET: ${{ secrets.JWT_REFRESH_SECRET || 'refresh_test_123' }}
           DB_PASSWORD: ${{ secrets.DB_PASSWORD || 'test_pass' }}
           DB_USER: ${{ secrets.DB_USER || 'root' }}
           DB_HOST: ${{ secrets.DB_HOST || 'localhost' }}
           DB_NAME: ${{ secrets.DB_NAME || 'voz_comunal' }}
-
       - name: Wait for services
         run: sleep 20
 
