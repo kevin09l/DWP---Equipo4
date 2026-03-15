@@ -10,14 +10,9 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
-
-// allow our frontend origin and send cookies for auth (refresh token)
-// NB: vite sometimes picks a different port (5173, 5174, …) so we allow
-// any localhost:517x address and also permit a custom FRONTEND_URL via env.
 app.use(
   cors({
     origin: (origin, callback) => {
-      // allow requests with no origin (e.g. curl, mobile apps)
       if (!origin) return callback(null, true);
       const allowed = process.env.FRONTEND_URL || '';
       const isLocal517 = origin.startsWith('http://localhost:517');
@@ -36,7 +31,6 @@ app.use(express.json());
 app.use(cookieParser());
 
 app.use("/api/auth", authRoutes);
-
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.get(/^(?!\/api).+/, (req, res) => {
@@ -48,8 +42,6 @@ app.use(errorHandler);
 
 
 const PORT = process.env.PORT || 3010;
-
-// log some environment info for debugging
 console.log("Inicio del servidor con variables:", {
   PORT,
   DB_HOST: process.env.DB_HOST,
