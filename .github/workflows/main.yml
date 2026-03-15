@@ -2,7 +2,7 @@ name: CI/CD Pipeline
 
 on:
   push:
-    branches: ["dev", "main"]
+    branches: ["dev", "main","feature/login-register"]
   pull_request:
     branches: ["main"]
 
