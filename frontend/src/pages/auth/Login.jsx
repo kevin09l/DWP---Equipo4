@@ -28,10 +28,10 @@ export default function Login() {
   const [loading, setLoading] = useState(false);
   const [esExito, setEsExito] = useState(false);
 
-  const manejarLogin = async () => {
-
+ const manejarLogin = async () => {
     let hayError = false;
 
+    // Validaciones iniciales
     if (!usuario.trim()) {
       setErrorUsuario(true);
       userRef.current?.focus();
@@ -58,22 +58,30 @@ export default function Login() {
     setLoading(true);
 
     try {
-
       const data = await auth.login({
-        email: usuario,
+        email: usuario.trim(), // Limpiamos espacios para evitar errores de validación
         password,
       });
 
-      const role = data.user?.role;
+      // Extraemos la información del Backend
+      const role = data.user?.role; // Asegúrate que tu back mande 'role'
       const token = data.token;
 
       setEsExito(true);
       setMensajeError("¡Bienvenido! Iniciando sesión...");
 
+      // --- PERSISTENCIA DE DATOS (CORREGIDA) ---
       localStorage.setItem("token", token);
-      localStorage.setItem("user", data.user?.name || usuario);
-      localStorage.setItem("role", role);
+      
+      // Guardamos como objeto JSON para que AppRoutes no explote
+      localStorage.setItem("user", JSON.stringify({
+        name: data.user?.name || usuario,
+        rol: role
+      }));
+      
+      localStorage.setItem("role", role); // Lo dejamos también individual por si lo usas en otro lado
 
+      // Redirección con retraso para mostrar el mensaje de éxito (Tarea 4: Performance)
       setTimeout(() => {
         if (role === "admin") {
           navigate("/admin/dashboard");
@@ -85,19 +93,19 @@ export default function Login() {
       }, 1200);
 
     } catch (err) {
-
-      console.error(err);
+      console.error("Error en login:", err);
       setEsExito(false);
 
       if (!window.navigator.onLine) {
         setMensajeError("Sin conexión a internet. Verifique su red.");
       } else if (
-        err.message.includes("Network Error") ||
-        err.message.includes("fetch")
+        err.message?.includes("Network Error") ||
+        err.message?.includes("fetch")
       ) {
         setMensajeError("Error de red: No se pudo conectar con el servidor.");
       } else {
-        setMensajeError(err.message || "Error al iniciar sesión");
+        // Tarea 3: Mensajería de error clara pero segura
+        setMensajeError(err.message || "Credenciales incorrectas. Intente de nuevo.");
       }
 
       alertRef.current?.focus();
