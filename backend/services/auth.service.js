@@ -22,8 +22,6 @@ export const register = async (data) => {
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
-
-
     const userId = await authModel.createUser({
         name,
         email,
@@ -39,25 +37,10 @@ export const register = async (data) => {
 export const login = async (email, password) => {
 
     const user = await authModel.findByEmail(email);
-
-    if (!user) {
-        throw new ApiError(401, "Credenciales inválidas");
-    }
-
+    if (!user) throw new ApiError(401, "Credenciales inválidas");
     const isMatch = await bcrypt.compare(password, user.password);
-
-    if (!isMatch) {
-        throw new ApiError(401, "Credenciales inválidas");
-    }
-
-    if (!user.is_active) {
-        throw new ApiError(403, "Usuario deshabilitado");
-    }
-
-    if (!process.env.JWT_ACCESS_SECRET || !process.env.JWT_REFRESH_SECRET) {
-        console.error("JWT secret environment variables are not set");
-        throw new ApiError(500, "Configuración del servidor incompleta");
-    }
+    if (!isMatch) throw new ApiError(401, "Credenciales inválidas");
+    if (!user.is_active) throw new ApiError(403, "Usuario deshabilitado");
 
     const accessToken = jwt.sign(
         { id: user.id, role: user.role },
@@ -72,9 +55,7 @@ export const login = async (email, password) => {
     );
 
     const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
-
     await authModel.saveRefreshToken(user.id, refreshToken, expiresAt);
-
     return {
         accessToken,
         refreshToken,
@@ -84,4 +65,31 @@ export const login = async (email, password) => {
             role: user.role
         }
     };
+};
+
+export const refresh = async (refreshToken) => {
+
+    if (!refreshToken) throw new ApiError(401, "Token requerido");
+    const storedToken = await authModel.findRefreshToken(refreshToken);
+    if (!storedToken) throw new ApiError(403, "Token no registrado");
+
+    let decoded;
+    try {
+        decoded = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET);
+    } catch {
+        throw new ApiError(403, "Token inválido");
+    }
+    const accessToken = jwt.sign(
+        { id: decoded.id },
+        process.env.JWT_ACCESS_SECRET,
+        { expiresIn: process.env.ACCESS_EXPIRES }
+    );
+    return { accessToken };
+};
+export const logout = async (token) => {
+    if (!token) throw new ApiError(400, "Token requerido");
+    await authModel.deleteRefreshToken(token);
+};
+export const logoutAll = async (userId) => {
+    await authModel.deleteAllUserTokens(userId);
 };
