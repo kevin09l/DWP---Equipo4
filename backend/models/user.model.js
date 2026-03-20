@@ -17,7 +17,6 @@ export const findByWaterMeter = async (waterMeter) => {
 };
 
 export const createUser = async (user) => {
-    console.log(user)
     const [result] = await db.query(
         `INSERT INTO users 
         (name, email, address, water_meter, password, role)
@@ -47,5 +46,20 @@ export const deleteRefreshToken = async (token) => {
     await db.query(
         "DELETE FROM refresh_tokens WHERE token = ?",
         [token]
+    );
+};
+
+export const findRefreshToken = async (token) => {
+    const [rows] = await db.query(
+        "SELECT * FROM refresh_tokens WHERE token = ?",
+        [token]
+    );
+    return rows[0];
+};
+
+export const deleteAllUserTokens = async (userId) => {
+    await db.query(
+        "DELETE FROM refresh_tokens WHERE user_id = ?",
+        [userId]
     );
 };
