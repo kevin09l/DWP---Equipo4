@@ -1,6 +1,7 @@
 import { Router } from "express";
-import { register, login } from "../controllers/auth.controller.js";
+import { register, login, refresh, logout, logoutAll } from "../controllers/auth.controller.js";
 import { body } from "express-validator";
+import { verifyToken } from "../middlewares/auth.middleware.js";
 
 const router = Router();
 router.post(
@@ -36,7 +37,6 @@ body("medidor")
 
 register
 );
-
 router.post(
 "/login",
 
@@ -52,5 +52,9 @@ body("password")
 
 login
 );
+
+router.post("/refresh", refresh);
+router.post("/logout", logout);
+router.post("/logout-all", verifyToken, logoutAll);
 
 export default router;
