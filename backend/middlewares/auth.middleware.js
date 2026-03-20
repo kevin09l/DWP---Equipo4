@@ -5,18 +5,26 @@ export const verifyToken = (req, res, next) => {
     const authHeader = req.headers.authorization;
 
     if (!authHeader) {
-        return res.status(401).json({ message: "Token requerido" });
+        return res.status(401).json({
+            success: false,
+            message: "Token requerido"
+        });
+    }
+    const parts = authHeader.split(" ");
+
+    if (parts.length !== 2 || parts[0] !== "Bearer") {
+        return res.status(401).json({
+            success: false,
+            message: "Formato de token inválido"
+        });
     }
 
-    const token = authHeader.split(" ")[1];
-
+    const token = parts[1];
     try {
-
         const decoded = jwt.verify(
             token,
             process.env.JWT_ACCESS_SECRET
         );
-
         req.user = decoded;
 
         next();
@@ -24,7 +32,8 @@ export const verifyToken = (req, res, next) => {
     } catch (error) {
 
         return res.status(403).json({
-            message: "Token inválido"
+            success: false,
+            message: "Token inválido o expirado"
         });
 
     }
