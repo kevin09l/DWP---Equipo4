@@ -1,10 +1,15 @@
-import { useLocation, NavLink, useNavigate } from "react-router-dom";
-import { useEffect, useRef } from "react";
+import { useLocation, NavLink } from "react-router-dom";
+import { useRef } from "react";
 import { navLinkStyle } from "../styles/navLinkStyle";
+import { useAuth } from "../context/authContext";
+import { useOnlineStatus } from "../hooks/useOnlineStatus";
 
 export default function AdminNavbar() {
   const location = useLocation();
   const navRef = useRef(null);
+
+  const {logout} = useAuth()
+  const isOnline = useOnlineStatus();
 
   const handleKeyboard = (e) => {
     const links = navRef.current?.querySelectorAll("a");
@@ -28,6 +33,12 @@ export default function AdminNavbar() {
   };
 
   return (
+  <> 
+    {!isOnline && (
+      <div className="offline-message">
+          Sin conexión a internet ⚠️
+      </div>
+    )}
     <nav
       ref={navRef}
       aria-label="Navegación principal del administrador"
@@ -89,6 +100,11 @@ export default function AdminNavbar() {
       >
         Consejos
       </NavLink>
+
+      <button onClick={logout} disabled={!isOnline}>
+        Cerrar sesión
+      </button>
     </nav>
+  </>
   );
 }

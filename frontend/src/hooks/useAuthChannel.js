@@ -2,7 +2,7 @@ import { useEffect } from "react";
 
 const authChannel = new BroadcastChannel("auth");
 
-export const useAuthChannel = () => {
+export const useAuthChannel = (onLogout, onLogin) => {
   useEffect(() => {
     const handleMessage = (event) => {
       const data = event.data;
@@ -10,19 +10,11 @@ export const useAuthChannel = () => {
       if (!data) return;
 
       if (data.type === "logout") {
-        localStorage.removeItem("token");
-        localStorage.removeItem("user");
-        localStorage.removeItem("role");
-
-        window.location.replace("/");
+        onLogout?.();
       }
 
       if (data.type === "login") {
-        if (data.role === "admin") {
-          window.location.replace("/admin/dashboard");
-        } else {
-          window.location.replace("/user/home");
-        }
+        onLogin?.(data.role);
       }
     };
 
@@ -31,7 +23,7 @@ export const useAuthChannel = () => {
     return () => {
       authChannel.removeEventListener("message", handleMessage);
     };
-  }, []);
+  }, [onLogout, onLogin]);
 };
 
 export const sendLogout = () => {

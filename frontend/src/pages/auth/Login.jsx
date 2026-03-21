@@ -2,7 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { useRef, useState } from "react";
 import "../../styles/styles.css";
 import { sendLogin } from "../../hooks/useAuthChannel";
-
+import { useAuth } from "../../context/authContext";
 import Loader from "../../components/Loader";
 import { auth } from "../../services/api";
 
@@ -14,7 +14,7 @@ import Alert from "../../components/ui/Alert";
 export default function Login() {
 
   const navigate = useNavigate();
-
+  const { login } = useAuth();
   const userRef = useRef(null);
   const passwordRef = useRef(null);
   const alertRef = useRef(null);
@@ -55,6 +55,11 @@ export default function Login() {
       return;
     }
 
+    if (!navigator.onLine) {
+      setMensajeError("Sin conexión a internet.");
+      return;
+    }
+
     setMensajeError("");
     setLoading(true);
 
@@ -71,16 +76,14 @@ export default function Login() {
       setEsExito(true);
       setMensajeError("¡Bienvenido! Iniciando sesión...");
 
-      // --- PERSISTENCIA DE DATOS (CORREGIDA) ---
-      localStorage.setItem("token", token);
-      
-      // Guardamos como objeto JSON para que AppRoutes no explote
-      localStorage.setItem("user", JSON.stringify({
-        name: data.user?.name || usuario,
-        rol: role
-      }));
-      
-      localStorage.setItem("role", role);
+      login({
+        token: data.token,
+        user: {
+          name: data.user?.name || usuario,
+          rol: role,
+        },
+      });
+    
       sendLogin(role);
 
       // Redirección con retraso para mostrar el mensaje de éxito (Tarea 4: Performance)

@@ -5,15 +5,12 @@ export default function Breadcrumbs() {
 
   const segments = location.pathname
     .split("/")
-    .filter(Boolean);
+    .filter((segment) => segment && segment !== "user");
+
 
   return (
     <nav aria-label="Breadcrumb" style={{ marginBottom: "16px" }}>
       <ol style={{ display: "flex", listStyle: "none", padding: 0 }}>
-        <li>
-          <Link to="/">Inicio</Link>
-          <span aria-hidden="true"> / </span>
-        </li>
 
         {segments.map((segment, index) => {
           const path = "/" + segments.slice(0, index + 1).join("/");
