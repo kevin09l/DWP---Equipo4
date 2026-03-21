@@ -1,10 +1,48 @@
 import { NavLink } from "react-router-dom";
-import { useRef } from "react";
+import { useRef, useState, useEffect } from "react";
+import { useAuthChannel, sendLogout } from "../hooks/useAuthChannel";
+import {auth} from '../services/api'
 import "../styles/styles.css";
 
 export default function UserNavbar() {
 
   const navRef = useRef(null); 
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  useAuthChannel(); 
+  
+    useEffect(() => {
+    const token = localStorage.getItem("token");
+    setIsAuthenticated(!!token);
+  }, []);
+
+  useEffect(() => {
+    const channel = new BroadcastChannel("auth");
+
+    channel.onmessage = (event) => {
+      if (event.data.type === "logout") {
+        setIsAuthenticated(false);
+      }
+
+      if (event.data.type === "login") {
+        setIsAuthenticated(true);
+      }
+    };
+
+    return () => channel.close();
+  }, []);
+
+  const handleLogout = async() => {
+    await auth.logout(); 
+    
+    localStorage.removeItem("token"); 
+    localStorage.removeItem("user");
+    localStorage.removeItem("role");
+          
+    setIsAuthenticated(false);
+
+    sendLogout();
+    window.location.replace("/")
+  }
 
   const manejarTeclado = (e) => {
     const items = navRef.current?.querySelectorAll(".nav-pill");
@@ -33,9 +71,15 @@ export default function UserNavbar() {
       
       <div className="home-navbar-left">
         <div className="user-avatar"></div>
-        <NavLink to="/" className="login-pill">
-          Iniciar sesión
-        </NavLink>
+           {!isAuthenticated ? (
+          <NavLink to="/login" className="login-pill">
+            Iniciar sesión
+          </NavLink>
+        ) : (
+          <button onClick={handleLogout}>
+            Cerrar sesión
+          </button>
+        )}
       </div>
       
       <nav

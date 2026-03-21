@@ -1,6 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { useRef, useState } from "react";
 import "../../styles/styles.css";
+import { sendLogin } from "../../hooks/useAuthChannel";
 
 import Loader from "../../components/Loader";
 import { auth } from "../../services/api";
@@ -64,7 +65,7 @@ export default function Login() {
       });
 
       // Extraemos la información del Backend
-      const role = data.user?.role; // Asegúrate que tu back mande 'role'
+      const role = data.user?.role; 
       const token = data.token;
 
       setEsExito(true);
@@ -79,7 +80,8 @@ export default function Login() {
         rol: role
       }));
       
-      localStorage.setItem("role", role); // Lo dejamos también individual por si lo usas en otro lado
+      localStorage.setItem("role", role);
+      sendLogin(role);
 
       // Redirección con retraso para mostrar el mensaje de éxito (Tarea 4: Performance)
       setTimeout(() => {
