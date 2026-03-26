@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useRef, useState } from "react";
 import "../../styles/styles.css";
 import { sendLogin } from "../../hooks/useAuthChannel";
@@ -241,6 +241,11 @@ export default function Login() {
                 "Iniciar sesión"
               )}
             </Button>
+          </div>
+          <div className="end">
+            <Button type="button"
+                className="link-button"
+                onClick={() => navigate("/forgotpassword")}>Olvide mi contraseña</Button>
           </div>
         </form>
       </div>

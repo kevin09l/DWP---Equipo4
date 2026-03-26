@@ -7,7 +7,8 @@ import UserRoutes from "./UserRoutes";
 import AdminRoutes from "./AdminRoutes";
 import NotFound from "../pages/errors/NotFound";
 import ServerError from "../pages/errors/ServerError";
-
+import ForgotPassword from "../pages/auth/ForgotPassword";
+import ResetPassword from "../pages/auth/ResetPassword";
 // Componente Protector
 const ProtectedRoute = ({ isAllowed, children }) => {
   if (!isAllowed) {
@@ -62,7 +63,8 @@ export default function AppRoutes() {
       />
 
       <Route path="/register" element={<Register />} />
-
+      <Route path="/forgotpassword" element={<ForgotPassword/>} />
+      <Route path="/resetpassword" element={<ResetPassword/>} />
       {/* Tarea 2: Seguridad - Rutas Protegidas */}
       {/* El usuario común o admin pueden ver rutas de user */}
       <Route 

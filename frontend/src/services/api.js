@@ -42,4 +42,5 @@ export const auth = {
   register: (data) => request("/auth/register", { method: "POST", body: JSON.stringify(data) }),
   logout: () => request("/auth/logout", { method: "POST", credentials: "include"}),
   logoutAll: () => request("/auth/logout-all", { method: "POST", credentials: "include" }),
+  refresh: () => request("/auth/refresh", {method: "POST", credentials: "include"})
 };

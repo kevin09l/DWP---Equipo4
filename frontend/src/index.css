@@ -90,3 +90,18 @@
   text-align: "center";
   padding: "5px";
 }
+
+.end{
+  display: flex;
+  justify-content: end;
+  margin-top: 12px;
+
+}
+
+.link-button{
+ color:#2a5298; 
+ font-size: 14px;
+  text-decoration: none;
+  background-color: white;
+  border: none;
+}
