@@ -1,5 +1,6 @@
 import { Router } from "express";
-import { register, login, refresh, logout, logoutAll } from "../controllers/auth.controller.js";
+import {
+register,login,refresh,logout,logoutAll,forgotPassword,resetPassword} from "../controllers/auth.controller.js";
 import { body } from "express-validator";
 import { verifyToken } from "../middlewares/auth.middleware.js";
 
@@ -56,5 +57,32 @@ login
 router.post("/refresh", refresh);
 router.post("/logout", logout);
 router.post("/logout-all", verifyToken, logoutAll);
+
+router.post(
+"/forgot-password",
+
+body("email")
+.isEmail()
+.withMessage("Email inválido")
+.normalizeEmail(),
+
+forgotPassword
+);
+
+router.post(
+"/reset-password",
+
+body("token")
+.notEmpty()
+.withMessage("El token es obligatorio")
+.trim(),
+
+body("newPassword")
+.isLength({ min: 6 })
+.withMessage("La contraseña debe tener al menos 6 caracteres")
+.trim(),
+
+resetPassword
+);
 
 export default router;
