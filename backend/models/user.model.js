@@ -34,6 +34,13 @@ export const createUser = async (user) => {
     return result.insertId;
 };
 
+export const updatePasswordById = async (userId, hashedPassword) => {
+    await db.query(
+        "UPDATE users SET password = ? WHERE id = ?",
+        [hashedPassword, userId]
+    );
+};
+
 export const saveRefreshToken = async (userId, token, expiresAt) => {
     await db.query(
         `INSERT INTO refresh_tokens (user_id, token, expires_at)
