@@ -1,6 +1,8 @@
 import { useState } from "react";
 import  Label  from "../../components/ui/Label";
 import Input from "../../components/ui/Input";
+import Alert from "../../components/ui/Alert";
+import { auth } from "../../services/api";
 
 export default function ForgotPassword() {
   const [email, setEmail] = useState("");
@@ -12,7 +14,7 @@ export default function ForgotPassword() {
     return regex.test(value);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     setError("");
@@ -27,10 +29,16 @@ export default function ForgotPassword() {
       setError("Ingresa un correo electrónico válido");
       return;
     }
+    
+    try {
+        await auth.forgotPassword(email); 
 
-    setMessage(
-      "Si el correo está registrado, recibirás las instrucciones en breve."
-    );
+        setMessage("Si el correo está registrado, recibirás las instrucciones en breve.");
+    
+    } catch (err){
+    
+        setError(err.response?.message || "Error del servidor");    }
+  
   };
 
   return (
@@ -55,20 +63,8 @@ export default function ForgotPassword() {
             />
           </div>
 
-          <div
-            id="email-error"
-            aria-live="assertive"
-            style={{ color: "red", minHeight: "20px" }}
-          >
-            {error}
-          </div>
-
-          <div
-            aria-live="polite"
-            style={{ color: "green", minHeight: "20px" }}
-          >
-            {message}
-          </div>
+          {error && <Alert message={error} type="error" />}
+          {message && <Alert message={message} type="success" />}
 
           <button type="submit" className="btn btn-primary">Enviar instrucciones</button>
         </form>

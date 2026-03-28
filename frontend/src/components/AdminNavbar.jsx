@@ -1,7 +1,7 @@
 import { useLocation, NavLink } from "react-router-dom";
 import { useRef } from "react";
 import { navLinkStyle } from "../styles/navLinkStyle";
-import { useAuth } from "../context/authContext";
+import { useAuth } from "../hooks/useAuth";
 import { useOnlineStatus } from "../hooks/useOnlineStatus";
 
 export default function AdminNavbar() {

@@ -1,6 +1,7 @@
 // default base URL: when running in development we proxy /api to the
 // backend so we can simply use a relative path. In production you can
 // override via VITE_API_BASE_URL (e.g. http://localhost:3010/api or
+
 // http://backend-dev:3010/api when inside Docker).
 const API_BASE = import.meta.env.VITE_API_BASE_URL || "/api";
 
@@ -42,5 +43,7 @@ export const auth = {
   register: (data) => request("/auth/register", { method: "POST", body: JSON.stringify(data) }),
   logout: () => request("/auth/logout", { method: "POST", credentials: "include"}),
   logoutAll: () => request("/auth/logout-all", { method: "POST", credentials: "include" }),
-  refresh: () => request("/auth/refresh", {method: "POST", credentials: "include"})
+  refresh: () => request("/auth/refresh", {method: "POST", credentials: "include"}), 
+  forgotPassword: (email) => request("/auth/forgot-password", { method: "POST" , body: JSON.stringify({ email })}), 
+  resetPassword: (token, newPassword) => request("/auth/reset-password", { method: "POST", body: JSON.stringify({ token, newPassword })})
 };

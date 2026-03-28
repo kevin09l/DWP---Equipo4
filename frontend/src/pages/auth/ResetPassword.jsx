@@ -1,8 +1,14 @@
 import { useState } from "react";
 import Label from "../../components/ui/Label";
 import Input from "../../components/ui/Input";
+import Alert from "../../components/ui/Alert";
+import { useSearchParams } from "react-router-dom";
+import { auth } from "../../services/api";
 
 export default function ResetPassword() {
+  const [params] = useSearchParams(); 
+  const token = params.get("token"); 
+
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -17,7 +23,7 @@ export default function ResetPassword() {
     return minLength && hasNumber;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     setError("");
@@ -40,7 +46,16 @@ export default function ResetPassword() {
       return;
     }
 
-    setMessage("Tu contraseña ha sido actualizada correctamente");
+    try {
+        
+        await auth.resetPassword(token, password); 
+
+        setMessage("Tu contraseña ha sido actualizada correctamente");
+
+    } catch(err) {
+        
+        setError(err.response?.message || "Token inválido o expirado");    }
+
   };
 
   return (
@@ -88,20 +103,8 @@ export default function ResetPassword() {
             {showPassword ? "Ocultar contraseña" : "Ver contraseña"}
           </button>
 
-          <div
-            id="password-error"
-            aria-live="assertive"
-            style={{ color: "red", minHeight: "20px" }}
-          >
-            {error}
-          </div>
-
-          <div
-            aria-live="polite"
-            style={{ color: "green", minHeight: "20px" }}
-          >
-            {message}
-          </div>
+          {error && <Alert message={error} type="error" />}
+          {message && <Alert message={message} type="success" />}
 
           <button type="submit" className="btn btn-primary">Guardar nueva contraseña</button>
         </form>

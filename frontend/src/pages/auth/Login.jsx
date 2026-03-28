@@ -2,7 +2,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useRef, useState } from "react";
 import "../../styles/styles.css";
 import { sendLogin } from "../../hooks/useAuthChannel";
-import { useAuth } from "../../context/authContext";
+import { useAuth } from "../../hooks/useAuth";
 import Loader from "../../components/Loader";
 import { auth } from "../../services/api";
 

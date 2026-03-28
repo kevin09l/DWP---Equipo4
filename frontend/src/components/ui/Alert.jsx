@@ -1,4 +1,5 @@
 export default function Alert({ message, type = "error" }) {
+  if (!message) return null;
 
   const className =
     type === "success"
@@ -9,7 +10,7 @@ export default function Alert({ message, type = "error" }) {
     <p
       className={className}
       role="alert"
-      aria-live="assertive"
+      aria-live={type === "error" ? "assertive" : "polite"}
     >
       {message}
     </p>

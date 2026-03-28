@@ -1,6 +1,6 @@
 import { NavLink } from "react-router-dom";
 import { useRef } from "react";
-import { useAuth } from "../context/authContext";
+import { useAuth } from "../hooks/useAuth";
 import { useOnlineStatus } from "../hooks/useOnlineStatus";
 import "../styles/styles.css";
 
