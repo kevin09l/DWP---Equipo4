@@ -3,11 +3,13 @@ import  Label  from "../../components/ui/Label";
 import Input from "../../components/ui/Input";
 import Alert from "../../components/ui/Alert";
 import { auth } from "../../services/api";
+import { useNavigate } from "react-router-dom";
 
 export default function ForgotPassword() {
   const [email, setEmail] = useState("");
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
+  const navigate = useNavigate();
 
   const validateEmail = (value) => {
     const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -31,13 +33,19 @@ export default function ForgotPassword() {
     }
     
     try {
-        await auth.forgotPassword(email); 
+        // Hacemos la petición
+        const response = await auth.forgotPassword(email); 
 
-        setMessage("Si el correo está registrado, recibirás las instrucciones en breve.");
+        // Si el Back nos da el token (en localhost), saltamos directo
+        if (response.success && response.token) {
+            navigate(`/ResetPassword?token=${response.token}`);
+        } else {
+            setMessage("Si el correo está registrado, recibirás instrucciones.");
+        }
     
     } catch (err){
-    
-        setError(err.response?.message || "Error del servidor");    }
+        setError(err.response?.data?.message || "Error del servidor");
+    }
   
   };
 

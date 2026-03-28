@@ -5,6 +5,8 @@ import { ApiError } from "../utils/ApiError.js";
 import * as authModel from "../models/user.model.js";
 import * as passwordResetTokenModel from "../models/passwordResetToken.model.js";
 
+
+
 export const register = async (data) => {
 
     const { name, email, address, water_meter, password } = data;
@@ -96,7 +98,7 @@ export const logoutAll = async (userId) => {
     await authModel.deleteAllUserTokens(userId);
 };
 
-const PASSWORD_RESET_TOKEN_TTL_MINUTES = 15;
+const PASSWORD_RESET_TOKEN_TTL_MINUTES = process.env.PASSWORD_RESET_TOKEN_TTL || 15;
 
 const buildPasswordResetToken = () => crypto.randomBytes(32).toString("hex");
 

@@ -2,12 +2,13 @@ import { useState } from "react";
 import Label from "../../components/ui/Label";
 import Input from "../../components/ui/Input";
 import Alert from "../../components/ui/Alert";
-import { useSearchParams } from "react-router-dom";
+import { useSearchParams,useNavigate } from "react-router-dom";
 import { auth } from "../../services/api";
+
 
 export default function ResetPassword() {
   const [params] = useSearchParams(); 
-  const token = params.get("token"); 
+  const token = params.get("token");
 
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -15,6 +16,9 @@ export default function ResetPassword() {
 
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
+  const navigate = useNavigate();
+
+  
 
   const validatePassword = (value) => {
     const minLength = value.length >= 8;
@@ -46,15 +50,18 @@ export default function ResetPassword() {
       return;
     }
 
-    try {
-        
+   try {
+        // Enviamos el token que capturamos de la URL y la nueva clave
         await auth.resetPassword(token, password); 
 
         setMessage("Tu contraseña ha sido actualizada correctamente");
+        
+        // Redirigir al login tras 2 segundos de éxito
+        setTimeout(() => navigate("/Login"), 2000);
 
     } catch(err) {
-        
-        setError(err.response?.message || "Token inválido o expirado");    }
+        setError(err.response?.data?.message || "Token inválido o expirado");
+    }
 
   };
 

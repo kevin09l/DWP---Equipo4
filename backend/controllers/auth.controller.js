@@ -80,17 +80,18 @@ export const logoutAll = async (req, res, next) => {
 
 export const forgotPassword = async (req, res, next) => {
     try {
-        const errors = validationResult(req);
-        if (!errors.isEmpty()) {
-            return res.status(400).json({ success:false, errors: errors.array() });
-        }
-
         const { email } = req.body;
-        await authService.forgotPassword(email);
+        
+        
+        const result = await authService.forgotPassword(email);
+    
+        const tokenToSend = result ? result.token : null;
 
         res.json({
             success: true,
-            message: "Si el correo existe, se enviaron instrucciones"
+            message: "Si el correo existe, se enviaron instrucciones",
+        
+            token: tokenToSend 
         });
     } catch (error) {
         next(error);
@@ -99,11 +100,6 @@ export const forgotPassword = async (req, res, next) => {
 
 export const resetPassword = async (req, res, next) => {
     try {
-        const errors = validationResult(req);
-        if (!errors.isEmpty()) {
-            return res.status(400).json({ success:false, errors: errors.array() });
-        }
-
         const { token, newPassword } = req.body;
         await authService.resetPassword(token, newPassword);
 
