@@ -57,7 +57,7 @@ export default function ResetPassword() {
         setMessage("Tu contraseña ha sido actualizada correctamente");
         
         // Redirigir al login tras 2 segundos de éxito
-        setTimeout(() => navigate("/Login"), 2000);
+        setTimeout(() => navigate("/"), 2000);
 
     } catch(err) {
         setError(err.response?.data?.message || "Token inválido o expirado");
