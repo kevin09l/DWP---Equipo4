@@ -1,7 +1,6 @@
 import jwt from "jsonwebtoken";
 
 export const verifyToken = (req, res, next) => {
-
     const authHeader = req.headers.authorization;
 
     if (!authHeader) {
@@ -10,31 +9,29 @@ export const verifyToken = (req, res, next) => {
             message: "Token requerido"
         });
     }
-    const parts = authHeader.split(" ");
 
-    if (parts.length !== 2 || parts[0] !== "Bearer") {
+    const [scheme, token] = authHeader.split(" ");
+
+    if (scheme !== "Bearer" || !token) {
         return res.status(401).json({
             success: false,
-            message: "Formato de token inválido"
+            message: "Token invalido"
         });
     }
 
-    const token = parts[1];
     try {
-        const decoded = jwt.verify(
-            token,
-            process.env.JWT_ACCESS_SECRET
-        );
-        req.user = decoded;
+        const decoded = jwt.verify(token, process.env.JWT_ACCESS_SECRET);
 
-        next();
+        req.user = {
+            id: decoded.id,
+            role: decoded.role
+        };
 
-    } catch (error) {
-
-        return res.status(403).json({
+        return next();
+    } catch {
+        return res.status(401).json({
             success: false,
-            message: "Token inválido o expirado"
+            message: "Token invalido"
         });
-
     }
 };
