@@ -1,7 +1,7 @@
 import db from "../config/db.js";
 
 export const findByEmail = async (email) => {
-    const [rows] = await db.query(
+    const [rows] = await db.execute(
         "SELECT * FROM users WHERE email = ?",
         [email]
     );
@@ -9,7 +9,7 @@ export const findByEmail = async (email) => {
 };
 
 export const findByWaterMeter = async (waterMeter) => {
-    const [rows] = await db.query(
+    const [rows] = await db.execute(
         "SELECT * FROM users WHERE water_meter = ?",
         [waterMeter]
     );
@@ -17,7 +17,7 @@ export const findByWaterMeter = async (waterMeter) => {
 };
 
 export const createUser = async (user) => {
-    const [result] = await db.query(
+    const [result] = await db.execute(
         `INSERT INTO users 
         (name, email, address, water_meter, password, role)
         VALUES (?, ?, ?, ?, ?, ?)`,
@@ -35,14 +35,14 @@ export const createUser = async (user) => {
 };
 
 export const updatePasswordById = async (userId, hashedPassword) => {
-    await db.query(
+    await db.execute(
         "UPDATE users SET password = ? WHERE id = ?",
         [hashedPassword, userId]
     );
 };
 
 export const saveRefreshToken = async (userId, token, expiresAt) => {
-    await db.query(
+    await db.execute(
         `INSERT INTO refresh_tokens (user_id, token, expires_at)
          VALUES (?, ?, ?)`,
         [userId, token, expiresAt]
@@ -50,14 +50,14 @@ export const saveRefreshToken = async (userId, token, expiresAt) => {
 };
 
 export const deleteRefreshToken = async (token) => {
-    await db.query(
+    await db.execute(
         "DELETE FROM refresh_tokens WHERE token = ?",
         [token]
     );
 };
 
 export const findRefreshToken = async (token) => {
-    const [rows] = await db.query(
+    const [rows] = await db.execute(
         "SELECT * FROM refresh_tokens WHERE token = ?",
         [token]
     );
@@ -65,7 +65,7 @@ export const findRefreshToken = async (token) => {
 };
 
 export const deleteAllUserTokens = async (userId) => {
-    await db.query(
+    await db.execute(
         "DELETE FROM refresh_tokens WHERE user_id = ?",
         [userId]
     );
