@@ -5,10 +5,7 @@ import { ApiError } from "../utils/ApiError.js";
 import * as authModel from "../models/user.model.js";
 import * as passwordResetTokenModel from "../models/passwordResetToken.model.js";
 
-
-
 export const register = async (data) => {
-
     const { name, email, address, water_meter, password } = data;
 
     if (!name || !email || !address || !water_meter || !password) {
@@ -17,12 +14,12 @@ export const register = async (data) => {
 
     const existingEmail = await authModel.findByEmail(email);
     if (existingEmail) {
-        throw new ApiError(400, "El correo ya está registrado");
+        throw new ApiError(400, "El correo ya esta registrado");
     }
 
     const existingMeter = await authModel.findByWaterMeter(water_meter);
     if (existingMeter) {
-        throw new ApiError(400, "El medidor ya está registrado");
+        throw new ApiError(400, "El medidor ya esta registrado");
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -39,11 +36,11 @@ export const register = async (data) => {
 };
 
 export const login = async (email, password) => {
-
     const user = await authModel.findByEmail(email);
-    if (!user) throw new ApiError(401, "Credenciales inválidas");
+    if (!user) throw new ApiError(401, "Credenciales invalidas");
+
     const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) throw new ApiError(401, "Credenciales inválidas");
+    if (!isMatch) throw new ApiError(401, "Credenciales invalidas");
     if (!user.is_active) throw new ApiError(403, "Usuario deshabilitado");
 
     const accessToken = jwt.sign(
@@ -60,6 +57,7 @@ export const login = async (email, password) => {
 
     const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
     await authModel.saveRefreshToken(user.id, refreshToken, expiresAt);
+
     return {
         accessToken,
         refreshToken,
@@ -72,8 +70,8 @@ export const login = async (email, password) => {
 };
 
 export const refresh = async (refreshToken) => {
-
     if (!refreshToken) throw new ApiError(401, "Token requerido");
+
     const storedToken = await authModel.findRefreshToken(refreshToken);
     if (!storedToken) throw new ApiError(403, "Token no registrado");
 
@@ -81,19 +79,23 @@ export const refresh = async (refreshToken) => {
     try {
         decoded = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET);
     } catch {
-        throw new ApiError(403, "Token inválido");
+        throw new ApiError(403, "Token invalido");
     }
+
     const accessToken = jwt.sign(
         { id: decoded.id },
         process.env.JWT_ACCESS_SECRET,
         { expiresIn: process.env.ACCESS_EXPIRES }
     );
+
     return { accessToken };
 };
+
 export const logout = async (token) => {
     if (!token) throw new ApiError(400, "Token requerido");
     await authModel.deleteRefreshToken(token);
 };
+
 export const logoutAll = async (userId) => {
     await authModel.deleteAllUserTokens(userId);
 };
@@ -106,13 +108,11 @@ const hashPasswordResetToken = (token) =>
     crypto.createHash("sha256").update(token).digest("hex");
 
 export const forgotPassword = async (email) => {
-
     if (!email) {
         throw new ApiError(400, "El correo es obligatorio");
     }
 
     const user = await authModel.findByEmail(email);
-
     if (!user) {
         return null;
     }
@@ -135,13 +135,12 @@ export const forgotPassword = async (email) => {
 };
 
 export const resetPassword = async (token, newPassword) => {
-
     if (!token || !newPassword) {
-        throw new ApiError(400, "Token y nueva contraseña son obligatorios");
+        throw new ApiError(400, "Token y nueva contrasena son obligatorios");
     }
 
-    if (newPassword.length < 6) {
-        throw new ApiError(400, "La contraseña debe tener al menos 6 caracteres");
+    if (newPassword.length < 8) {
+        throw new ApiError(400, "La contrasena debe tener al menos 8 caracteres");
     }
 
     await passwordResetTokenModel.deleteExpiredPasswordResetTokens();
@@ -150,7 +149,7 @@ export const resetPassword = async (token, newPassword) => {
     const storedToken = await passwordResetTokenModel.findValidPasswordResetToken(tokenHash);
 
     if (!storedToken) {
-        throw new ApiError(400, "Token inválido o expirado");
+        throw new ApiError(400, "Token invalido o expirado");
     }
 
     const hashedPassword = await bcrypt.hash(newPassword, 10);
