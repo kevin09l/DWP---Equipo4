@@ -1,7 +1,7 @@
 import db from "../config/db.js";
 
 export const savePasswordResetToken = async (userId, tokenHash, expiresAt) => {
-    await db.query(
+    await db.execute(
         `INSERT INTO password_reset_tokens (user_id, token_hash, expires_at)
          VALUES (?, ?, ?)`,
         [userId, tokenHash, expiresAt]
@@ -9,7 +9,7 @@ export const savePasswordResetToken = async (userId, tokenHash, expiresAt) => {
 };
 
 export const findValidPasswordResetToken = async (tokenHash) => {
-    const [rows] = await db.query(
+    const [rows] = await db.execute(
         `SELECT id, user_id, token_hash, expires_at
          FROM password_reset_tokens
          WHERE token_hash = ?
@@ -22,21 +22,21 @@ export const findValidPasswordResetToken = async (tokenHash) => {
 };
 
 export const deletePasswordResetTokenById = async (id) => {
-    await db.query(
+    await db.execute(
         "DELETE FROM password_reset_tokens WHERE id = ?",
         [id]
     );
 };
 
 export const deletePasswordResetTokensByUserId = async (userId) => {
-    await db.query(
+    await db.execute(
         "DELETE FROM password_reset_tokens WHERE user_id = ?",
         [userId]
     );
 };
 
 export const deleteExpiredPasswordResetTokens = async () => {
-    await db.query(
+    await db.execute(
         "DELETE FROM password_reset_tokens WHERE expires_at <= NOW()"
     );
 };
