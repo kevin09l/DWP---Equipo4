@@ -1,5 +1,6 @@
-import { Routes, Route, Navigate, useLocation } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { Routes, Route, Navigate } from "react-router-dom";
+import { useContext } from "react";
+import { AuthContext } from "../context/authContext";
 
 import Login from "../pages/auth/Login";
 import Register from "../pages/auth/Register";
@@ -9,44 +10,15 @@ import NotFound from "../pages/errors/NotFound";
 import ServerError from "../pages/errors/ServerError";
 import ForgotPassword from "../pages/auth/ForgotPassword";
 import ResetPassword from "../pages/auth/ResetPassword";
-// Componente Protector
-const ProtectedRoute = ({ isAllowed, children }) => {
-  if (!isAllowed) {
-    // Si no tiene permiso, lo mandamos a la raíz (Login)
-    return <Navigate to="/" replace />;
-  }
-  return children;
-};
+
+import ProtectedRoute from "./ProtectedRoute";
 
 export default function AppRoutes() {
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const location = useLocation();
+ const {user, loading} = useContext(AuthContext)
 
-  // Función para leer el usuario de forma segura
-  const getStoredUser = () => {
-    try {
-      const stored = localStorage.getItem("user");
-      if (stored && stored.startsWith('{')) {
-        return JSON.parse(stored);
-      }
-    } catch (error) {
-      console.error("Error en storage", error);
-    }
-    return null;
-  };
+  if (loading) return null; 
 
-  // Cada vez que la ruta cambie, verificamos el usuario
-  // Esto soluciona el problema de "no me deja entrar" tras el login
-  useEffect(() => {
-    const currentUser = getStoredUser();
-    setUser(currentUser);
-    setLoading(false);
-  }, [location]);
-
-  if (loading) return null; // O un Loader para la Tarea 4
-
-  const userRole = user?.rol;
+  const role = user?.role;
 
   return (
     <Routes>
@@ -55,7 +27,7 @@ export default function AppRoutes() {
         path="/" 
         element={
           user ? (
-            userRole === 'admin' ? <Navigate to="/admin/dashboard" replace /> : <Navigate to="/user/home" replace />
+            role === 'admin' ? <Navigate to="/admin/dashboard" replace /> : <Navigate to="/user/home" replace />
           ) : (
             <Login />
           )
@@ -70,7 +42,7 @@ export default function AppRoutes() {
       <Route 
         path="/user/*" 
         element={
-          <ProtectedRoute isAllowed={!!user && (userRole === 'user' || userRole === 'admin')}>
+          <ProtectedRoute allowRoles={["user","admin"]}>
             <UserRoutes />
           </ProtectedRoute>
         } 
@@ -80,7 +52,7 @@ export default function AppRoutes() {
       <Route 
         path="/admin/*" 
         element={
-          <ProtectedRoute isAllowed={!!user && userRole === 'admin'}>
+          <ProtectedRoute allowRoles={["admin"]}>
             <AdminRoutes />
           </ProtectedRoute>
         } 

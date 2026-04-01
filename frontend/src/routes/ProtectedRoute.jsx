@@ -1,17 +1,23 @@
-import { Navigate, Outlet } from 'react-router-dom';
-import { useAuth } from "../context/authContext";
+import { Navigate } from 'react-router-dom';
+import { useContext } from 'react';
+import { AuthContext } from "../context/authContext";
 
-const ProtectedRoute = ({ isAllowed, redirectTo = "/" }) => {
-  const { loading } = useAuth();
+const ProtectedRoute = ({ children, allowRoles = [], redirectTo = "/" }) => {
+  const { user, loading } = useContext(AuthContext);
 
   if (loading) return null; 
   
-  if (!isAllowed) {
+  if (!user) {
     // Si no tienes permiso, esta línea es la que te manda al inicio
+    // NO AUTENTICADO
     return <Navigate to={redirectTo} replace />;
   }
+    // SIN PERMISOS
+  if(allowRoles.length && !allowRoles.includes(user.role)){
+    return <Navigate to="/user/home" replace />;
+  }
   // Si tienes permiso, Outlet permite ver las rutas hijas (AdminRoutes/UserRoutes)
-  return <Outlet />;
+  return children
 };
 
 export default ProtectedRoute;

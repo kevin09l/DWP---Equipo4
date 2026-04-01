@@ -5,7 +5,6 @@ import { useAuthChannel, sendLogout } from "../hooks/useAuthChannel";
 export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -20,16 +19,15 @@ export const AuthProvider = ({ children }) => {
 
       try {
         const res = await auth.refresh();
+        // guardar nuevo token
         localStorage.setItem("token", res.accessToken);
-
+        // obtener usuario guardado
         const storedUser = JSON.parse(localStorage.getItem("user"));
         setUser(storedUser);
-        setIsAuthenticated(true);
 
       } catch {
         localStorage.clear();
         setUser(null);
-        setIsAuthenticated(false);
       } finally {
         setLoading(false);
       }
@@ -40,11 +38,15 @@ export const AuthProvider = ({ children }) => {
 
   const login = (data) => {
     localStorage.setItem("token", data.token);
-    localStorage.setItem("user", JSON.stringify(data.user));
-    localStorage.setItem("role", data.user.rol);
 
-    setUser(data.user);
-    setIsAuthenticated(true);
+    const normalizedUser = {
+      ...data.user,
+      role: data.user.role || data.user.rol
+    }
+
+    localStorage.setItem("user", JSON.stringify(normalizedUser));
+
+    setUser(normalizedUser);
   };
 
   const logout = async () => {
@@ -54,7 +56,6 @@ export const AuthProvider = ({ children }) => {
 
     localStorage.clear();
     setUser(null);
-    setIsAuthenticated(false);
 
     sendLogout(); 
   };
@@ -63,18 +64,16 @@ export const AuthProvider = ({ children }) => {
     () => {
       localStorage.clear();
       setUser(null);
-      setIsAuthenticated(false);
     },
     (role) => {
       const storedUser = JSON.parse(localStorage.getItem("user"));
       setUser(storedUser);
-      setIsAuthenticated(true);
     }
   );
 
   return (
     <AuthContext.Provider
-      value={{ isAuthenticated, user, loading, login, logout }}
+      value={{ user, loading, isAutheticated: !!user, login, logout }}
     >
       {children}
     </AuthContext.Provider>
