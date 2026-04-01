@@ -1,88 +1,60 @@
 import { Router } from "express";
-import {
-register,login,refresh,logout,logoutAll,forgotPassword,resetPassword} from "../controllers/auth.controller.js";
-import { body } from "express-validator";
+import { body, validationResult } from "express-validator";
+
 import { verifyToken } from "../middlewares/auth.middleware.js";
+import { checkRole } from "../middlewares/role.middleware.js";
 
 const router = Router();
-router.post(
-"/register",
 
-body("email")
-.isEmail()
-.withMessage("Email inválido")
-.normalizeEmail(),
+router.use(verifyToken);
+router.use(checkRole(["admin"]));
 
-body("password")
-.isLength({ min: 6 })
-.withMessage("La contraseña debe tener al menos 6 caracteres")
-.trim(),
+router.get("/reports", (req, res) => {
+    res.json({ message: "Cargando reportes para el administrador..." });
+});
 
-body("nombre")
-.notEmpty()
-.withMessage("El nombre es obligatorio")
-.trim()
-.escape(),
+router.get("/users", (req, res) => {
+    res.json({ message: "Lista de usuarios de Voz Comunal" });
+});
 
-body("direccion")
-.notEmpty()
-.withMessage("La dirección es obligatoria")
-.trim()
-.escape(),
-
-body("medidor")
-.notEmpty()
-.withMessage("El medidor es obligatorio")
-.trim()
-.escape(),
-
-register
-);
-router.post(
-"/login",
-
-body("email")
-.isEmail()
-.withMessage("Email inválido")
-.normalizeEmail(),
-
-body("password")
-.isLength({ min: 6 })
-.withMessage("La contraseña debe tener al menos 6 caracteres")
-.trim(),
-
-login
-);
-
-router.post("/refresh", refresh);
-router.post("/logout", logout);
-router.post("/logout-all", verifyToken, logoutAll);
+router.post("/approve-report/:id", (req, res) => {
+    res.json({ message: "Reporte aprobado con exito" });
+});
 
 router.post(
-"/forgot-password",
+    "/reports",
+    checkRole(["admin", "tecnico"]),
+    body("title")
+        .trim()
+        .isLength({ min: 5, max: 120 })
+        .withMessage("El titulo debe tener entre 5 y 120 caracteres")
+        .matches(/^[^<>]*$/)
+        .withMessage("El titulo contiene caracteres no permitidos"),
+    body("description")
+        .trim()
+        .isLength({ min: 10, max: 1000 })
+        .withMessage("La descripcion debe tener entre 10 y 1000 caracteres")
+        .matches(/^[^<>]*$/)
+        .withMessage("La descripcion contiene caracteres no permitidos"),
+    body("priority")
+        .optional()
+        .isIn(["baja", "media", "alta"])
+        .withMessage("La prioridad no es valida"),
+    (req, res) => {
+        const errors = validationResult(req);
 
-body("email")
-.isEmail()
-.withMessage("Email inválido")
-.normalizeEmail(),
+        if (!errors.isEmpty()) {
+            return res.status(400).json({
+                success: false,
+                errors: errors.array()
+            });
+        }
 
-forgotPassword
-);
-
-router.post(
-"/reset-password",
-
-body("token")
-.notEmpty()
-.withMessage("El token es obligatorio")
-.trim(),
-
-body("newPassword")
-.isLength({ min: 6 })
-.withMessage("La contraseña debe tener al menos 6 caracteres")
-.trim(),
-
-resetPassword
+        return res.status(201).json({
+            success: true,
+            message: "Reporte validado correctamente"
+        });
+    }
 );
 
 export default router;
