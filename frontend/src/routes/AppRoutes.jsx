@@ -1,6 +1,5 @@
 import { Routes, Route, Navigate } from "react-router-dom";
-import { useContext } from "react";
-import { AuthContext } from "../context/authContext";
+import { useAuth } from "../hooks/useAuth";
 
 import Login from "../pages/auth/Login";
 import Register from "../pages/auth/Register";
@@ -12,11 +11,12 @@ import ForgotPassword from "../pages/auth/ForgotPassword";
 import ResetPassword from "../pages/auth/ResetPassword";
 
 import ProtectedRoute from "./ProtectedRoute";
+import Loader from "../components/Loader";
 
 export default function AppRoutes() {
- const {user, loading} = useContext(AuthContext)
+ const {user, loading} = useAuth();
 
-  if (loading) return null; 
+  if (loading) return <Loader/>; 
 
   const role = user?.role;
 

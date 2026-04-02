@@ -54,7 +54,12 @@ export const AuthProvider = ({ children }) => {
       await auth.logout();
     } catch (e) {}
 
-    localStorage.clear();
+    localStorage.setItem("logoutMessage", "Sesión cerrada correctamente");
+
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    localStorage.removeItem("role");
+
     setUser(null);
 
     sendLogout(); 

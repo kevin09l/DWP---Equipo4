@@ -16,8 +16,11 @@ export default function ManageReports() {
           <p><strong>Descripción:</strong></p>
 
           <div className="admin-report-actions">
-            <button className="btn-review">En revisión</button>
-            <button className="btn-accept">Aceptado</button>
+            <RoleGuard allowRoles={["admin"]}>
+              <button className="btn-review">En revisión</button>
+              <button className="btn-accept">Aceptado</button>
+            </RoleGuard>
+            
           </div>
         </div>
 

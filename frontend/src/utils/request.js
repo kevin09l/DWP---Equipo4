@@ -52,6 +52,9 @@ export async function request(path, options = {}) {
     } catch {
       // sesión expirada totalmente
       localStorage.clear();
+      
+      localStorage.setItem("sessionExpired", "true");
+
       window.location.href = "/";
       return;
     }

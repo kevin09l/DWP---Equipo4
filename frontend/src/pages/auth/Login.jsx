@@ -1,5 +1,5 @@
 import { Link, useNavigate } from "react-router-dom";
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import "../../styles/styles.css";
 import { sendLogin } from "../../hooks/useAuthChannel";
 import { useAuth } from "../../hooks/useAuth";
@@ -28,6 +28,26 @@ export default function Login() {
   const [mensajeError, setMensajeError] = useState("");
   const [loading, setLoading] = useState(false);
   const [esExito, setEsExito] = useState(false);
+  
+  const [sessionExpirada, setSessionExpirada] = useState(false);
+
+  useEffect(() => {
+    const expired = localStorage.getItem("sessionExpired");
+
+    if (expired) {
+      setMensajeError("Tu sesión expiró. Inicia sesión nuevamente.");
+      setEsExito(false);
+      setSessionExpirada(true);
+
+      localStorage.removeItem("sessionExpired");
+    }
+  }, []);
+
+  useEffect(() => {
+    if (sessionExpirada) {
+      alertRef.current?.focus();
+    }
+  }, [sessionExpirada]);
 
  const manejarLogin = async () => {
     let hayError = false;
