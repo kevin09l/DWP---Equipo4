@@ -1,22 +1,25 @@
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 
-const ProtectedRoute = ({ children, allowRoles = [], redirectTo = "/" }) => {
+const ProtectedRoute = ({ children, allowRoles = [], redirectTo = "/login" }) => {
   const { user, loading } = useAuth();
 
+  // Mientras el hook de Auth verifica la sesión, mostramos nada o un spinner
   if (loading) return null; 
   
+  // Si no hay usuario en el estado global, mandamos al Login
   if (!user) {
-    // Si no tienes permiso, esta línea es la que te manda al inicio
-    // NO AUTENTICADO
     return <Navigate to={redirectTo} replace />;
   }
-    // SIN PERMISOS
-  if(allowRoles.length && !allowRoles.includes(user.role)){
+
+  // Si el usuario existe pero su rol no está permitido para esta ruta
+  if (allowRoles.length && !allowRoles.includes(user.role)) {
+    // Ejemplo: Un 'user' intentando entrar a '/admin' -> lo mandamos a su home
     return <Navigate to="/user/home" replace />;
   }
-  // Si tienes permiso, Outlet permite ver las rutas hijas (AdminRoutes/UserRoutes)
-  return children
+
+  // Si pasó todas las validaciones, renderizamos las rutas hijas
+  return children;
 };
 
 export default ProtectedRoute;

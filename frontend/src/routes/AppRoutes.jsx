@@ -14,52 +14,61 @@ import ProtectedRoute from "./ProtectedRoute";
 import Loader from "../components/Loader";
 
 export default function AppRoutes() {
- const {user, loading} = useAuth();
+  const { user, loading } = useAuth();
 
-  if (loading) return <Loader/>; 
+  if (loading) return <Loader />;
 
   const role = user?.role;
 
   return (
     <Routes>
-      {/* RUTA RAÍZ: Maneja la lógica de redirección inicial */}
-      <Route 
-        path="/" 
+      {}
+      <Route
+        path="/"
         element={
           user ? (
-            role === 'admin' ? <Navigate to="/admin/dashboard" replace /> : <Navigate to="/user/home" replace />
+            role === "admin" ? (
+              <Navigate to="/admin/dashboard" replace />
+            ) : (
+              <Navigate to="/user/home" replace />
+            )
           ) : (
-            <Login />
+            <Navigate to="/login" replace />
           )
-        } 
+        }
+      />
+
+      {}
+      <Route 
+        path="/login" 
+        element={user ? <Navigate to="/" replace /> : <Login />} 
       />
 
       <Route path="/register" element={<Register />} />
-      <Route path="/forgotpassword" element={<ForgotPassword/>} />
-      <Route path="/resetpassword" element={<ResetPassword/>} />
+      <Route path="/forgotpassword" element={<ForgotPassword />} />
+      <Route path="/resetpassword" element={<ResetPassword />} />
+
       {/* Tarea 2: Seguridad - Rutas Protegidas */}
-      {/* El usuario común o admin pueden ver rutas de user */}
-      <Route 
-        path="/user/*" 
+      <Route
+        path="/user/*"
         element={
-          <ProtectedRoute allowRoles={["user","admin"]}>
+          <ProtectedRoute allowRoles={["user", "admin"]}>
             <UserRoutes />
           </ProtectedRoute>
-        } 
+        }
       />
 
-      {/* SOLO el admin puede ver rutas de admin */}
-      <Route 
-        path="/admin/*" 
+      <Route
+        path="/admin/*"
         element={
           <ProtectedRoute allowRoles={["admin"]}>
             <AdminRoutes />
           </ProtectedRoute>
-        } 
+        }
       />
 
-      <Route path="/500" element={<ServerError/>}/>
-      <Route path="*" element={<NotFound/>}/>
+      <Route path="/500" element={<ServerError />} />
+      <Route path="*" element={<NotFound />} />
     </Routes>
   );
 }
