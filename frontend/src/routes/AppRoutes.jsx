@@ -48,7 +48,7 @@ export default function AppRoutes() {
       <Route path="/forgotpassword" element={<ForgotPassword />} />
       <Route path="/resetpassword" element={<ResetPassword />} />
 
-      {/* Tarea 2: Seguridad - Rutas Protegidas */}
+      {}
       <Route
         path="/user/*"
         element={

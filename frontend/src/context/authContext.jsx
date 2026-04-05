@@ -92,7 +92,7 @@ useEffect(() => {
 
   return (
     <AuthContext.Provider
-      value={{ user, loading, isAutheticated: !!user, login, logout }}
+      value={{ user, loading, isAuthenticated: !!user, login, logout }}
     >
       {children}
     </AuthContext.Provider>
