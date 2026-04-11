@@ -1,19 +1,44 @@
 import "../../styles/styles.css";
+import { useEffect, useEffectEvent, useState } from "react";
+import { admin } from "../../services/api";
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
 
 export default function Dashboard() {
+  const [reports, setReports] = useState([]); 
+
+  useEffect(() => {
+    cargar();
+  }, []); 
+
+  const cargar = async () => {
+    const res = await admin.getReports(); 
+    setReports(res.data || []); 
+  }; 
+
+  const dataGrafica = [
+    { name: "Reportes", total: reportes.length },
+  ];
   return (
     <div className="admin-dashboard-page">
      
       <h1 className="admin-dashboard-title">Panel de Control</h1>
 
-      
       <div className="admin-dashboard-cards">
       
         <div className="admin-card">
-          <div className="report-circle">
-            <span>70</span>
+
+          <h3>Total Reportes</h3>
+          <h2>{reports.length}</h2>
+          <div style={{ height: 200 }}>
+            <ResponsiveContainer>
+              <BarChart data={dataGrafica}>
+                <XAxis dataKey="name" />
+                <YAxis />
+                <Tooltip />
+                <Bar dataKey="total" />
+              </BarChart>
+            </ResponsiveContainer>
           </div>
-          <p className="card-text">Total de reportes activos</p>
         </div>
 
    
