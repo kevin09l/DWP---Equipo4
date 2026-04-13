@@ -1,65 +1,54 @@
-import { useRef, useEffect } from "react";
+import { useRef, useEffect, useState } from "react";
 import "../../styles/styles.css";
+import Loader from "../../components/Loader";
+import { schedulesApi } from "../../services/api";
 
 export default function Schedule() {
   const headingRef = useRef(null);
+  const [schedules, setSchedules] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
   useEffect(() => {
     headingRef.current?.focus();
   }, []);
 
+  useEffect(() => {
+    const loadSchedules = async () => {
+      try {
+        setLoading(true);
+        const res = await schedulesApi.list();
+        setSchedules(res.data || []);
+      } catch (err) {
+        setError(err.message || "No se pudieron cargar los horarios.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadSchedules();
+  }, []);
+
+  if (loading) {
+    return <Loader message="Cargando horarios..." />;
+  }
+
   return (
     <div className="schedule-page">
-   
       <div className="schedule-header">
         <h2 ref={headingRef} tabIndex="-1">Horarios</h2>
       </div>
 
-      <div className="schedule-filter">
-        <label>Colonia / zona:</label>
-        <select>
-          <option>Selecciona una zona</option>
-          <option>Zona Norte</option>
-          <option>Zona Centro</option>
-          <option>Zona Sur</option>
-        </select>
-      </div>
+      {error && <p role="alert">{error}</p>}
 
-      <div className="schedule-table-container">
-        <table className="schedule-table">
-          <thead>
-            <tr>
-              <th></th>
-              <th>Lunes</th>
-              <th>Martes</th>
-              <th>Miércoles</th>
-              <th>Jueves</th>
-              <th>Viernes</th>
-              <th>Sábado</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td className="time-label">Antes del medio día</td>
-              <td><span className="time-box">7:00 - 9:00</span></td>
-              <td></td>
-              <td></td>
-              <td></td>
-              <td><span className="time-box">10:00 - 12:00</span></td>
-              <td></td>
-            </tr>
-
-            <tr>
-              <td className="time-label">Después del medio día</td>
-              <td></td>
-              <td></td>
-              <td><span className="time-box">13:00 - 15:00</span></td>
-              <td></td>
-              <td></td>
-              <td></td>
-            </tr>
-          </tbody>
-        </table>
+      <div style={{ display: "grid", gap: "12px" }}>
+        {schedules.map((schedule) => (
+          <div key={schedule.id} className="admin-report-card">
+            <p>{schedule.content}</p>
+            <p>{new Date(schedule.created_at).toLocaleString()}</p>
+          </div>
+        ))}
+        {!schedules.length && <p>No hay horarios publicados.</p>}
       </div>
     </div>
   );
