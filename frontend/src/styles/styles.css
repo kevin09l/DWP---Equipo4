@@ -1057,6 +1057,91 @@ html, body {
   margin-bottom: 10px;
 }
 
+.admin-reports-table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed; 
+  background: #e6f0ff;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+/* ENCABEZADOS */
+.admin-reports-table th {
+  background-color: #f3f4f6;
+  text-align: left;
+  padding: 12px;
+  font-weight: bold;
+  font-size: 14px;
+  border-bottom: 1px solid #ddd;
+}
+
+/* CELDAS */
+.admin-reports-table td {
+  padding: 12px;
+  border-bottom: 1px solid #eee;
+  vertical-align: top;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  white-space: normal;
+}
+
+/* ANCHOS POR COLUMNA (MUY IMPORTANTE) */
+.admin-reports-table th:nth-child(1),
+.admin-reports-table td:nth-child(1) {
+  width: 12%;
+}
+
+.admin-reports-table th:nth-child(2),
+.admin-reports-table td:nth-child(2) {
+  width: 15%;
+}
+
+.admin-reports-table th:nth-child(3),
+.admin-reports-table td:nth-child(3) {
+  width: 18%;
+}
+
+.admin-reports-table th:nth-child(4),
+.admin-reports-table td:nth-child(4) {
+  width: 25%;
+}
+
+.admin-reports-table th:nth-child(5),
+.admin-reports-table td:nth-child(5) {
+  width: 10%;
+}
+
+.admin-reports-table th:nth-child(6),
+.admin-reports-table td:nth-child(6) {
+  width: 20%;
+}
+
+/* FILAS */
+.admin-reports-table tr:hover {
+  background-color: #f9fafb;
+}
+
+/* ACCIONES */
+.admin-report-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* BOTONES EN FILA */
+.admin-report-actions div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+/* TEXTO LARGO (DESCRIPCIÓN) */
+.admin-reports-table td:nth-child(4) {
+  line-height: 1.4;
+  font-size: 13px;
+}
+
 /* BOTONES */
 .admin-report-actions {
   display: flex;

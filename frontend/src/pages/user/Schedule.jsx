@@ -31,13 +31,20 @@ export default function Schedule() {
     loadSchedules();
   }, []);
 
+  const zonas = [...new Set(schedules.map((s) => s.zone))];
+  
+  const normalize = (text) =>
+    text?.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+
   const filtrados = zone
-    ? schedules.filter((s) => s.zone === zone)
+    ? schedules.filter((s) => normalize(s.zone) === normalize(zone))
     : [];
 
   const getHorario = (day, shift) => {
     const item = filtrados.find(
-      (s) => s.day === day && s.shift === shift
+      (s) =>
+        normalize(s.day) === normalize(day) &&
+        normalize(s.shift) === normalize(shift)
     );
     return item ? item.hour : "";
   };
@@ -61,14 +68,18 @@ export default function Schedule() {
 
     <div className="schedule-filter">
         <Label htmlFor="zone">Colonia / zona:</Label>
-        <select 
+        <select
           id="zone"
           value={zone}
-          onChange={(e) => setZone(e.target.value)}>
+          onChange={(e) => setZone(e.target.value)}
+        >
           <option value="">Selecciona una zona</option>
-          <option>Zona Norte</option>
-          <option>Zona Centro</option>
-          <option>Zona Sur</option>
+
+          {zonas.map((z) => (
+            <option key={z} value={z}>
+              {z}
+            </option>
+          ))}
         </select>
       </div>
       
@@ -99,7 +110,7 @@ export default function Schedule() {
               <td>{renderCelda("Miércoles", "mañana")}</td>
               <td>{renderCelda("Jueves", "mañana")}</td>
               <td>{renderCelda("Viernes", "mañana")}</td>
-              <td>{renderCelda("Sabado", "mañana")}</td>
+              <td>{renderCelda("Sábado", "mañana")}</td>
             </tr>
 
             <tr>
@@ -109,7 +120,7 @@ export default function Schedule() {
               <td>{renderCelda("Miércoles", "tarde")}</td>
               <td>{renderCelda("Jueves", "tarde")}</td>
               <td>{renderCelda("Viernes", "tarde")}</td>
-              <td>{renderCelda("Sabado", "tarde")}</td>
+              <td>{renderCelda("Sábado", "tarde")}</td>
             </tr>
           </tbody>
         </table>
