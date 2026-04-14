@@ -42,6 +42,8 @@ CREATE TABLE announcements (
 CREATE TABLE reports (
     id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT NOT NULL,
+    address VARCHAR(255),
+    priority ENUM('baja', 'media', 'alta') NOT NULL,
     description TEXT NOT NULL,
     status ENUM('Pendiente', 'En Proceso', 'Atendido') DEFAULT 'Pendiente',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -50,12 +52,16 @@ CREATE TABLE reports (
 
 CREATE TABLE schedules (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    content TEXT NOT NULL,
+    zone VARCHAR(100) NOT NULL,
+    day VARCHAR(20) NOT NULL,
+    shift ENUM('mañana', 'tarde') NOT NULL,
+    hour VARCHAR(20) NOT NULL,    
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE tips (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    content TEXT NOT NULL,
+    title VARCHAR(150) NOT NULL,
+    description TEXT NOT NULL,    
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );

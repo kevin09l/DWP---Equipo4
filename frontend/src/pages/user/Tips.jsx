@@ -1,5 +1,6 @@
 import { useRef, useEffect, useState } from "react";
 import Loader from "../../components/Loader";
+import Alert from "../../components/ui/Alert";
 import { tipsApi } from "../../services/api";
 
 export default function Tips() {
@@ -38,7 +39,7 @@ export default function Tips() {
         <h2 ref={headingRef} tabIndex="-1">Consejos de cuidado del agua</h2>
       </div>
 
-      {error && <p role="alert">{error}</p>}
+      <Alert message={error} />
 
       <div className="tips-list">
         {tips.map((tip, index) => (

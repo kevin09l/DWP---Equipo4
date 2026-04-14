@@ -1,22 +1,39 @@
 import { useEffect, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { reportsApi } from "../../services/api";
+import Input from "../../components/ui/Input";
+import Label from "../../components/ui/Label";
+import Button from "../../components/ui/Button";
+import Alert from "../../components/ui/Alert";
 import Loader from "../../components/Loader";
 
 export default function Reports() {
   const headingRef = useRef(null);
+  const navigate = useNavigate();
+
+  const [address, setAddress] = useState("");
+  const [priority, setPriority] = useState("");
   const [description, setDescription] = useState("");
+
+  const [hasReports, setHasReports] = useState(false);
   const [reports, setReports] = useState([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState("");
+  const [error, setError] = useState("");
 
   const loadReports = async () => {
     try {
       setLoading(true);
       const res = await reportsApi.mine();
-      setReports(res.data || []);
+      const data = res.data || [];
+      setReports(data);
+
+      if (data.length > 0) {
+        setHasReports(true);
+      }
     } catch (err) {
-      setMessage(err.message || "No se pudieron cargar tus reportes.");
+      setError(err.message || "No se pudieron cargar tus reportes.");
     } finally {
       setLoading(false);
     }
@@ -24,21 +41,37 @@ export default function Reports() {
 
   useEffect(() => {
     headingRef.current?.focus();
+
+    const user = JSON.parse(localStorage.getItem("user"));
+    if (user?.address) setAddress(user.address);
+
     loadReports();
   }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    if (!address || !priority || !description) {
+      setError("Todos los campos son obligatorios");
+      return;
+    }
+
     try {
       setSaving(true);
+      setError("");
       setMessage("");
-      await reportsApi.create({ description });
+
+      await reportsApi.create({ address, priority, description });
+
       setDescription("");
+      setPriority("");
       setMessage("Reporte enviado correctamente.");
+
+      setHasReports(true);
       await loadReports();
+
     } catch (err) {
-      setMessage(err.message || "No se pudo enviar el reporte.");
+      setError(err.message || "No se pudo enviar el reporte.");
     } finally {
       setSaving(false);
     }
@@ -59,11 +92,38 @@ export default function Reports() {
         a tu cuenta y podras seguir su estado desde esta misma vista.
       </p>
 
-      {message && <p role="alert">{message}</p>}
+      <Alert message={error} />
+      <Alert message={message} type="success" />
+
+      {hasReports && (
+        <div >
+          <Button className=" btn btn-primary" onClick={() => navigate("/user/status")}>
+            Ver mis reportes
+          </Button>
+        </div>
+      )}
+
 
       <form className="reports-form" onSubmit={handleSubmit}>
         <div className="form-group">
-          <label htmlFor="description">Descripcion del reporte:</label>
+          <Label htmlFor="address">Dirección</Label>
+          <Input             
+          id="address"
+          value={address} 
+          onChange={(e) => setAddress(e.target.value)} />
+
+          <Label htmlFor="priority" >Urgencia</Label>
+          <select 
+          id="priority"
+          value={priority} 
+          onChange={(e) => setPriority(e.target.value)}>
+            <option value="">Selecciona</option>
+            <option value="baja">Baja</option>
+            <option value="media">Media</option>
+            <option value="alta">Alta</option>
+          </select>
+
+          <Label htmlFor="description">Descripcion del reporte:</Label>
           <textarea
             id="description"
             rows="4"
@@ -73,22 +133,12 @@ export default function Reports() {
         </div>
 
         <div className="reports-actions">
-          <button className="btn-report" type="submit" disabled={saving}>
+          <Button className="btn-report" type="submit" disabled={saving}>
             {saving ? "Enviando..." : "Realizar Reporte"}
-          </button>
+          </Button>
         </div>
       </form>
 
-      <div style={{ marginTop: "24px", display: "grid", gap: "12px" }}>
-        {reports.map((report) => (
-          <div key={report.id} className="admin-report-card">
-            <p><strong>Descripcion:</strong> {report.description}</p>
-            <p><strong>Estado:</strong> {report.status}</p>
-            <p><strong>Fecha:</strong> {new Date(report.created_at).toLocaleString()}</p>
-          </div>
-        ))}
-        {!reports.length && <p>No has enviado reportes aun.</p>}
-      </div>
     </div>
   );
 }

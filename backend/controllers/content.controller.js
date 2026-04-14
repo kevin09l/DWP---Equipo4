@@ -11,8 +11,14 @@ const validateRequiredText = (value, message) => {
 
 export const getAnnouncements = async (req, res, next) => {
     try {
-        const announcements = await contentModel.findAllAnnouncements();
-        res.json({ success: true, data: announcements });
+        const data = await contentModel.findAllAnnouncements();
+
+        const formatted = data.map(a => ({
+            ...a,
+            date: a.created_at
+        }));
+
+        res.json({ success: true, data: formatted });
     } catch (error) {
         next(error);
     }
@@ -74,12 +80,17 @@ export const deleteAnnouncement = async (req, res, next) => {
 
 export const createReport = async (req, res, next) => {
     try {
-        const { description } = req.body;
-        validateRequiredText(description, "La descripcion es obligatoria");
+        const { address, priority, description } = req.body;
+
+        validateRequiredText(address, "Dirección obligatoria");
+        validateRequiredText(priority, "Prioridad obligatoria");
+        validateRequiredText(description, "Descripción obligatoria");
 
         const id = await contentModel.createReport({
             userId: req.user.id,
-            description: String(description).trim()
+            address,
+            priority,
+            description
         });
 
         res.status(201).json({
@@ -95,7 +106,12 @@ export const createReport = async (req, res, next) => {
 export const getMyReports = async (req, res, next) => {
     try {
         const reports = await contentModel.findReportsByUserId(req.user.id);
-        res.json({ success: true, data: reports, validStatuses: REPORT_STATUSES });
+
+        res.json({
+            success: true,
+            data: reports,
+            validStatuses: REPORT_STATUSES
+        });
     } catch (error) {
         next(error);
     }
@@ -112,9 +128,12 @@ export const getSchedules = async (req, res, next) => {
 
 export const createSchedule = async (req, res, next) => {
     try {
-        const { content } = req.body;
-        validateRequiredText(content, "El contenido del horario es obligatorio");
-        const id = await contentModel.createSchedule({ content: String(content).trim() });
+        const { zone, day, shift, hour } = req.body;
+
+        const id = await contentModel.createSchedule({
+            zone, day, shift, hour
+        });
+
         res.status(201).json({ success: true, id });
     } catch (error) {
         next(error);
@@ -166,9 +185,13 @@ export const getTips = async (req, res, next) => {
 
 export const createTip = async (req, res, next) => {
     try {
-        const { content } = req.body;
-        validateRequiredText(content, "El contenido del consejo es obligatorio");
-        const id = await contentModel.createTip({ content: String(content).trim() });
+        const { title, description } = req.body;
+
+        validateRequiredText(title, "Título obligatorio");
+        validateRequiredText(description, "Descripción obligatoria");
+
+        const id = await contentModel.createTip({ title, description });
+
         res.status(201).json({ success: true, id });
     } catch (error) {
         next(error);

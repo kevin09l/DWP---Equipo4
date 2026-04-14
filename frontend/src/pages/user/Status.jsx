@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import Loader from "../../components/Loader";
+import Alert from "../../components/ui/Alert"
 import { reportsApi } from "../../services/api";
 
 export default function Status() {
@@ -35,16 +36,21 @@ export default function Status() {
   return (
     <div>
       <h1 ref={headingRef} tabIndex="-1">Estado de Reportes</h1>
-      {error && <p role="alert">{error}</p>}
+      <Alert message={error} />
 
       {reports.length ? (
-        reports.map((report) => (
-          <p key={report.id}>
-            Reporte #{report.id} - {report.status}
-          </p>
-        ))
+        <div style={{ display: "grid", gap: "12px", marginLeft: "50px" }}>
+          {reports.map((r) => (
+            <div key={r.id} className="card">
+              <p><strong>Dirección:</strong> {r.address}</p>
+              <p><strong>Descripción:</strong> {r.description}</p>
+              <p><strong>Estado:</strong> {r.status}</p>
+              <p><strong>Fecha:</strong> {new Date(r.created_at).toLocaleString()}</p>
+            </div>
+          ))}
+        </div>
       ) : (
-        <p>No hay reportes para mostrar.</p>
+        <p>No tienes reportes aún.</p>
       )}
     </div>
   );

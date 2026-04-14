@@ -1,11 +1,13 @@
 import { useRef, useEffect, useState } from "react";
 import "../../styles/styles.css";
 import Loader from "../../components/Loader";
+import Label from "../../components/ui/Label";
 import { schedulesApi } from "../../services/api";
 
 export default function Schedule() {
   const headingRef = useRef(null);
   const [schedules, setSchedules] = useState([]);
+  const [zone, setZone] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
@@ -29,6 +31,22 @@ export default function Schedule() {
     loadSchedules();
   }, []);
 
+  const filtrados = zone
+    ? schedules.filter((s) => s.zone === zone)
+    : [];
+
+  const getHorario = (day, shift) => {
+    const item = filtrados.find(
+      (s) => s.day === day && s.shift === shift
+    );
+    return item ? item.hour : "";
+  };
+
+  const renderCelda = (day, shift) => {
+    const hour = getHorario(day, shift);
+    return hour ? <span className="time-box">{hour}</span> : null;
+  };
+
   if (loading) {
     return <Loader message="Cargando horarios..." />;
   }
@@ -41,15 +59,62 @@ export default function Schedule() {
 
       {error && <p role="alert">{error}</p>}
 
-      <div style={{ display: "grid", gap: "12px" }}>
-        {schedules.map((schedule) => (
-          <div key={schedule.id} className="admin-report-card">
-            <p>{schedule.content}</p>
-            <p>{new Date(schedule.created_at).toLocaleString()}</p>
-          </div>
-        ))}
-        {!schedules.length && <p>No hay horarios publicados.</p>}
+    <div className="schedule-filter">
+        <Label htmlFor="zone">Colonia / zona:</Label>
+        <select 
+          id="zone"
+          value={zone}
+          onChange={(e) => setZone(e.target.value)}>
+          <option value="">Selecciona una zona</option>
+          <option>Zona Norte</option>
+          <option>Zona Centro</option>
+          <option>Zona Sur</option>
+        </select>
       </div>
-    </div>
+      
+      {!zone ? (
+        <p className="no-data">Selecciona una zona para ver horarios</p>
+      ) : filtrados.length === 0 ? (
+        <p className="no-data">No hay horarios publicados para esta zona</p>
+      ) : (
+      <div className="schedule-table-container">
+        <table className="schedule-table">
+          <thead>
+            <tr>
+              <th></th>
+              <th>Lunes</th>
+              <th>Martes</th>
+              <th>Miércoles</th>
+              <th>Jueves</th>
+              <th>Viernes</th>
+              <th>Sábado</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td className="time-label">Antes del medio día</td>
+              
+              <td>{renderCelda("Lunes", "mañana")}</td>
+              <td>{renderCelda("Martes", "mañana")}</td>
+              <td>{renderCelda("Miércoles", "mañana")}</td>
+              <td>{renderCelda("Jueves", "mañana")}</td>
+              <td>{renderCelda("Viernes", "mañana")}</td>
+              <td>{renderCelda("Sabado", "mañana")}</td>
+            </tr>
+
+            <tr>
+              <td className="time-label">Después del medio día</td>
+              <td>{renderCelda("Lunes", "tarde")}</td>
+              <td>{renderCelda("Martes", "tarde")}</td>
+              <td>{renderCelda("Miércoles", "tarde")}</td>
+              <td>{renderCelda("Jueves", "tarde")}</td>
+              <td>{renderCelda("Viernes", "tarde")}</td>
+              <td>{renderCelda("Sabado", "tarde")}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+  )}
+      </div>
   );
 }

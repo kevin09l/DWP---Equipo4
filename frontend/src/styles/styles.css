@@ -795,6 +795,14 @@ html, body {
 }
 
 /* CARD */
+
+.card {
+  background-color: white;
+  width: 520px;
+  padding: 30px;
+  border-radius: 14px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+}
 .admin-card {
   background-color: #ffffff;
   width: 340px;

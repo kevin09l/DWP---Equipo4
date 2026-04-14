@@ -40,11 +40,11 @@ export const deleteAnnouncementById = async (id) => {
     return result.affectedRows;
 };
 
-export const createReport = async ({ userId, description }) => {
+export const createReport = async ({ userId, address, priority, description }) => {
     const [result] = await db.execute(
-        `INSERT INTO reports (user_id, description)
-         VALUES (?, ?)`,
-        [userId, description]
+        `INSERT INTO reports (user_id, address, priority, description)
+         VALUES (?, ?, ?, ?)`,
+        [userId, address, priority, description]
     );
 
     return result.insertId;
@@ -52,7 +52,7 @@ export const createReport = async ({ userId, description }) => {
 
 export const findReportsByUserId = async (userId) => {
     const [rows] = await db.execute(
-        `SELECT id, user_id, description, status, created_at
+        `SELECT id, address, priority, description, status, created_at
          FROM reports
          WHERE user_id = ?
          ORDER BY created_at DESC`,
@@ -64,30 +64,29 @@ export const findReportsByUserId = async (userId) => {
 
 export const findAllSchedules = async () => {
     const [rows] = await db.execute(
-        `SELECT id, content, created_at
-         FROM schedules
-         ORDER BY created_at DESC`
+        `SELECT id, zone, day, shift, hour
+         FROM schedules`
     );
 
     return rows;
 };
 
-export const createSchedule = async ({ content }) => {
+export const createSchedule = async ({ zone, day, shift, hour }) => {
     const [result] = await db.execute(
-        `INSERT INTO schedules (content)
-         VALUES (?)`,
-        [content]
+        `INSERT INTO schedules (zone, day, shift, hour)
+         VALUES (?, ?, ?, ?)`,
+        [zone, day, shift, hour]
     );
 
     return result.insertId;
 };
 
-export const updateScheduleById = async (id, { content }) => {
+export const updateScheduleById = async (id, { zone, day, shift, hour }) => {
     const [result] = await db.execute(
         `UPDATE schedules
-         SET content = ?
-         WHERE id = ?`,
-        [content, id]
+        SET zone = ?, day = ?, shift = ?, hour = ?         
+        WHERE id = ?`,
+        [zone, day, shift, hour, id]
     );
 
     return result.affectedRows;
@@ -104,7 +103,7 @@ export const deleteScheduleById = async (id) => {
 
 export const findAllTips = async () => {
     const [rows] = await db.execute(
-        `SELECT id, content, created_at
+        `SELECT id, title, description
          FROM tips
          ORDER BY created_at DESC`
     );
@@ -112,22 +111,22 @@ export const findAllTips = async () => {
     return rows;
 };
 
-export const createTip = async ({ content }) => {
+export const createTip = async ({ title, description }) => {
     const [result] = await db.execute(
-        `INSERT INTO tips (content)
-         VALUES (?)`,
+        `INSERT INTO tips (title, description)
+         VALUES (?, ?)`,
         [content]
     );
 
     return result.insertId;
 };
 
-export const updateTipById = async (id, { content }) => {
+export const updateTipById = async (id, { title, description }) => {
     const [result] = await db.execute(
         `UPDATE tips
-         SET content = ?
+         SET title = ?, description = ?
          WHERE id = ?`,
-        [content, id]
+        [title, description, id]
     );
 
     return result.affectedRows;
