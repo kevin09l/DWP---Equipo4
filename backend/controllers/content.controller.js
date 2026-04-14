@@ -2,6 +2,8 @@ import { ApiError } from "../utils/ApiError.js";
 import * as contentModel from "../models/content.model.js";
 
 const REPORT_STATUSES = ["Pendiente", "En Proceso", "Atendido"];
+const PRIORITIES = ["baja", "media", "alta"];
+const SHIFTS = ["mañana", "tarde"];
 
 const validateRequiredText = (value, message) => {
     if (!String(value ?? "").trim()) {
@@ -86,6 +88,10 @@ export const createReport = async (req, res, next) => {
         validateRequiredText(priority, "Prioridad obligatoria");
         validateRequiredText(description, "Descripción obligatoria");
 
+        if (!PRIORITIES.includes(priority)) {
+            throw new ApiError(400, "Prioridad no válida");
+        }
+
         const id = await contentModel.createReport({
             userId: req.user.id,
             address,
@@ -130,6 +136,15 @@ export const createSchedule = async (req, res, next) => {
     try {
         const { zone, day, shift, hour } = req.body;
 
+        validateRequiredText(zone, "Zona obligatoria");
+        validateRequiredText(day, "Día obligatorio");
+        validateRequiredText(shift, "Turno obligatorio");
+        validateRequiredText(hour, "Hora obligatoria");
+
+        if (!SHIFTS.includes(shift)) {
+            throw new ApiError(400, "Turno no válido");
+        }
+
         const id = await contentModel.createSchedule({
             zone, day, shift, hour
         });
@@ -143,10 +158,22 @@ export const createSchedule = async (req, res, next) => {
 export const updateSchedule = async (req, res, next) => {
     try {
         const scheduleId = Number(req.params.id);
-        const { content } = req.body;
-        validateRequiredText(content, "El contenido del horario es obligatorio");
+        const { zone, day, shift, hour } = req.body;
+
+        validateRequiredText(zone, "Zona obligatoria");
+        validateRequiredText(day, "Día obligatorio");
+        validateRequiredText(shift, "Turno obligatorio");
+        validateRequiredText(hour, "Hora obligatoria");
+
+        if (!SHIFTS.includes(shift)) {
+            throw new ApiError(400, "Turno no válido");
+        }
+
         const affectedRows = await contentModel.updateScheduleById(scheduleId, {
-            content: String(content).trim()
+            zone: String(zone).trim(),
+            day: String(day).trim(),
+            shift: String(shift).trim(),
+            hour: String(hour).trim()
         });
 
         if (!affectedRows) {
@@ -201,10 +228,13 @@ export const createTip = async (req, res, next) => {
 export const updateTip = async (req, res, next) => {
     try {
         const tipId = Number(req.params.id);
-        const { content } = req.body;
-        validateRequiredText(content, "El contenido del consejo es obligatorio");
+        const { title, description } = req.body;
+        validateRequiredText(title, "Título obligatorio");
+        validateRequiredText(description, "Descripción obligatoria");
+
         const affectedRows = await contentModel.updateTipById(tipId, {
-            content: String(content).trim()
+            title: String(title).trim(),
+            description: String(description).trim()
         });
 
         if (!affectedRows) {

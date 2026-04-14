@@ -3,10 +3,14 @@ import { useEffect, useState } from "react";
 import Input from "../../components/ui/Input";
 import Label from "../../components/ui/Label";
 import Loader from "../../components/Loader";
+import Alert from "../../components/ui/Alert";
+import Button from "../../components/ui/Button";
 import { tipsApi } from "../../services/api";
 
+const emptyForm = { title: "", description: "" };
+
 export default function CrudTips() {
-  const [content, setContent] = useState("");
+  const [form, setForm] = useState(emptyForm);
   const [tips, setTips] = useState([]);
   const [editingId, setEditingId] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -31,21 +35,17 @@ export default function CrudTips() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    try {
-      if (editingId) {
-        await tipsApi.update(editingId, { content });
-        setMessage("Consejo actualizado correctamente.");
-      } else {
-        await tipsApi.create({ content });
-        setMessage("Consejo publicado correctamente.");
-      }
-
-      setContent("");
-      setEditingId(null);
-      await loadTips();
-    } catch (err) {
-      setMessage(err.message || "No se pudo guardar el consejo.");
+    if (editingId) {
+      await tipsApi.update(editingId, form);
+      setMessage("Actualizado");
+    } else {
+      await tipsApi.create(form);
+      setMessage("Creado");
     }
+
+    setForm(emptyForm);
+    setEditingId(null);
+    loadTips();
   };
 
   const handleDelete = async (id) => {
@@ -67,22 +67,22 @@ export default function CrudTips() {
       <div className="admin-tips-card">
         <h2 className="admin-tips-title">Consejos de ahorro</h2>
 
-        {message && <p role="alert">{message}</p>}
+        <Alert message={message} type="success" />
 
         <form onSubmit={handleSubmit}>
           <div className="form-group">
-            <Label htmlFor="tip-content">Contenido del consejo:</Label>
-            <Input
-              id="tip-content"
-              value={content}
-              type="text"
-              onChange={(e) => setContent(e.target.value)}
-              placeholder="Ej. Cierra la llave al cepillarte"
-            />
+            <Label htmlFor="tip-tittle">Título</Label>
+            <Input value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} />
+          </div>
+          <div className="form-group">
+            <Label htmlFor="tip-description">Contenido del consejo:</Label>
+            <Input 
+            value={form.description} 
+            onChange={(e) => setForm({ ...form, description: e.target.value })} />
           </div>
 
           <div className="admin-tips-actions">
-            <button
+            <Button
               type="button"
               className="btn-cancel"
               onClick={() => {
@@ -91,35 +91,36 @@ export default function CrudTips() {
               }}
             >
               Cancelar
-            </button>
+            </Button>
 
-            <button type="submit" className="btn-publish">
+            <Button type="submit" className="btn-publish">
               {editingId ? "Actualizar" : "Publicar"}
-            </button>
+            </Button>
           </div>
         </form>
 
         <div style={{ marginTop: "24px", display: "grid", gap: "12px" }}>
           {tips.map((tip) => (
             <div key={tip.id} className="tip-item">
-              <p>{tip.content}</p>
-              <p>{new Date(tip.created_at).toLocaleString()}</p>
+            <p>{tip.title}</p>
+            <p>{tip.description}</p>              
+            <p>{new Date(tip.created_at).toLocaleString()}</p>
               <div className="admin-tips-actions">
-                <button
+                <Button
                   className="btn-cancel"
                   onClick={() => {
                     setEditingId(tip.id);
-                    setContent(tip.content);
+                    setForm(tip);
                   }}
                 >
                   Editar
-                </button>
-                <button
+                </Button>
+                <Button
                   className="btn-publish"
                   onClick={() => handleDelete(tip.id)}
                 >
                   Eliminar
-                </button>
+                </Button>
               </div>
             </div>
           ))}

@@ -64,8 +64,9 @@ export const findReportsByUserId = async (userId) => {
 
 export const findAllSchedules = async () => {
     const [rows] = await db.execute(
-        `SELECT id, zone, day, shift, hour
-         FROM schedules`
+        `SELECT id, zone, day, shift, hour, created_at
+         FROM schedules
+         ORDER BY created_at DESC`
     );
 
     return rows;
@@ -103,7 +104,7 @@ export const deleteScheduleById = async (id) => {
 
 export const findAllTips = async () => {
     const [rows] = await db.execute(
-        `SELECT id, title, description
+        `SELECT id, title, description, created_at
          FROM tips
          ORDER BY created_at DESC`
     );
@@ -115,7 +116,7 @@ export const createTip = async ({ title, description }) => {
     const [result] = await db.execute(
         `INSERT INTO tips (title, description)
          VALUES (?, ?)`,
-        [content]
+        [title, description]
     );
 
     return result.insertId;

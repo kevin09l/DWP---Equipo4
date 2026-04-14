@@ -3,10 +3,14 @@ import { useEffect, useState } from "react";
 import Input from "../../components/ui/Input";
 import Label from "../../components/ui/Label";
 import Loader from "../../components/Loader";
+import Alert from "../../components/ui/Alert";
+import Button from "../../components/ui/Button";
 import { schedulesApi } from "../../services/api";
 
+const emptyForm = { zone: "", day: "", shift: "", hour: "" };
+
 export default function CrudSchedules() {
-  const [content, setContent] = useState("");
+  const [form, setForm] = useState(emptyForm);
   const [schedules, setSchedules] = useState([]);
   const [editingId, setEditingId] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -18,13 +22,13 @@ export default function CrudSchedules() {
       const res = await schedulesApi.list();
       setSchedules(res.data || []);
     } catch (err) {
-      setMessage(err.message || "No se pudieron cargar los horarios.");
+      setMessage(err.message);
     } finally {
       setLoading(false);
     }
   };
 
-  useEffect(() => {
+   useEffect(() => {
     loadSchedules();
   }, []);
 
@@ -33,18 +37,18 @@ export default function CrudSchedules() {
 
     try {
       if (editingId) {
-        await schedulesApi.update(editingId, { content });
-        setMessage("Horario actualizado correctamente.");
+        await schedulesApi.update(editingId, form);
+        setMessage("Horario actualizado");
       } else {
-        await schedulesApi.create({ content });
-        setMessage("Horario creado correctamente.");
+        await schedulesApi.create(form);
+        setMessage("Horario creado");
       }
 
-      setContent("");
+      setForm(emptyForm);
       setEditingId(null);
       await loadSchedules();
     } catch (err) {
-      setMessage(err.message || "No se pudo guardar el horario.");
+      setMessage(err.message);
     }
   };
 
@@ -69,22 +73,28 @@ export default function CrudSchedules() {
           Gestion de horarios
         </h2>
 
-        {message && <p role="alert">{message}</p>}
+      <Alert message={message} type="success" />
 
         <form className="admin-schedule-form" onSubmit={handleSubmit}>
           <div className="form-group">
-            <Label htmlFor="schedule-content">Contenido:</Label>
-            <Input
-              id="schedule-content"
-              value={content}
-              type="text"
-              onChange={(e) => setContent(e.target.value)}
-              placeholder="Ej. Zona Norte - Lunes y Miercoles de 7:00 a 11:00"
-            />
+            <Label htmlFor="zone">Zona</Label>
+            <Input value={form.zone} onChange={(e) => setForm({ ...form, zone: e.target.value })} />
+          </div>
+          <div className="form-group">
+            <Label htmlFor="day">Día</Label>
+            <Input value={form.day} onChange={(e) => setForm({ ...form, day: e.target.value })} />
+          </div>
+          <div className="form-group">
+            <Label htmlFor="shift">Turno</Label>
+            <Input value={form.shift} onChange={(e) => setForm({ ...form, shift: e.target.value })} />
+          </div>
+          <div className="form-group">
+            <Label htmlFor="hour">Hora</Label>
+            <Input value={form.hour} onChange={(e) => setForm({ ...form, hour: e.target.value })} />
           </div>
 
           <div className="admin-schedule-actions">
-            <button
+            <Button
               type="button"
               className="btn-cancel"
               onClick={() => {
@@ -93,35 +103,35 @@ export default function CrudSchedules() {
               }}
             >
               Cancelar
-            </button>
+            </Button>
 
-            <button type="submit" className="btn-save">
+            <Button type="submit" className="btn-save">
               {editingId ? "Actualizar" : "Guardar"}
-            </button>
+            </Button>
           </div>
         </form>
 
         <div style={{ marginTop: "24px", display: "grid", gap: "12px" }}>
           {schedules.map((schedule) => (
             <div key={schedule.id} className="admin-report-card">
-              <p>{schedule.content}</p>
+              <p>{schedule.zone} - {schedule.day} - {schedule.shift} - {schedule.hour}</p>
               <p>{new Date(schedule.created_at).toLocaleString()}</p>
               <div className="admin-schedule-actions">
-                <button
+                <Button
                   className="btn-cancel"
                   onClick={() => {
                     setEditingId(schedule.id);
-                    setContent(schedule.content);
+                    setForm(schedule);
                   }}
                 >
                   Editar
-                </button>
-                <button
+                </Button>
+                <Button
                   className="btn-delete"
                   onClick={() => handleDelete(schedule.id)}
                 >
                   Eliminar
-                </button>
+                </Button>
               </div>
             </div>
           ))}

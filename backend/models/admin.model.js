@@ -32,11 +32,20 @@ export const updateUserStatusById = async (userId, status) => {
 
 export const findAllReports = async () => {
     const [rows] = await db.execute(
-        `SELECT reports.id, reports.user_id, reports.description, reports.status, reports.created_at,
-                users.name AS user_name, users.email AS user_email, users.address AS user_address
-         FROM reports
-         INNER JOIN users ON users.id = reports.user_id
-         ORDER BY reports.created_at DESC`
+        `SELECT 
+            reports.id,
+            reports.user_id,
+            reports.address,
+            reports.priority,
+            reports.description,
+            reports.status,
+            reports.created_at,
+            users.name AS user_name,
+            users.email AS user_email,
+            users.address AS user_address
+        FROM reports
+        INNER JOIN users ON users.id = reports.user_id
+        ORDER BY reports.created_at DESC`
     );
 
     return rows;

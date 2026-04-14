@@ -3,6 +3,8 @@ import { useEffect, useState } from "react";
 import Input from "../../components/ui/Input";
 import Label from "../../components/ui/Label";
 import Loader from "../../components/Loader";
+import Alert from "../../components/ui/Alert";
+import Button from "../../components/ui/Button";
 import { announcementsApi } from "../../services/api";
 
 const emptyForm = { title: "", description: "" };
@@ -81,7 +83,7 @@ export default function CrudAnnouncements() {
           Gestion de avisos
         </h2>
 
-        {message && <p role="alert">{message}</p>}
+        <Alert message={message} type="success" />
 
         <form onSubmit={handleSubmit}>
           <div className="form-group">
@@ -105,12 +107,12 @@ export default function CrudAnnouncements() {
           </div>
 
           <div className="admin-announcements-actions">
-            <button type="button" className="btn-cancel" onClick={resetForm}>
+            <Button type="button" className="btn-cancel" onClick={resetForm}>
               Cancelar
-            </button>
-            <button type="submit" className="btn-publish" disabled={saving}>
+            </Button>
+            <Button type="submit" className="btn-publish" disabled={saving}>
               {editingId ? "Actualizar" : "Publicar"}
-            </button>
+            </Button>
           </div>
         </form>
 
@@ -122,7 +124,7 @@ export default function CrudAnnouncements() {
                 <p>{item.description}</p>
                 <p>{new Date(item.created_at).toLocaleString()}</p>
                 <div className="admin-announcements-actions">
-                  <button
+                  <Button
                     className="btn-cancel"
                     onClick={() => {
                       setEditingId(item.id);
@@ -130,13 +132,13 @@ export default function CrudAnnouncements() {
                     }}
                   >
                     Editar
-                  </button>
-                  <button
+                  </Button>
+                  <Button
                     className="btn-publish"
                     onClick={() => handleDelete(item.id)}
                   >
                     Eliminar
-                  </button>
+                  </Button>
                 </div>
               </div>
             </div>
