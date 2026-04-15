@@ -140,7 +140,7 @@ export default function Register() {
             )}
           </div>
           <div className="form-group">
-            <Label htmlFor="email">Correo electronico:</Label>
+            <Label htmlFor="email">Correo electrónico:</Label>
             <Input
               id="email"
               type="email"
@@ -157,7 +157,7 @@ export default function Register() {
             )}
           </div>
           <div className="form-group">
-            <Label htmlFor="direccion">Direccion:</Label>
+            <Label htmlFor="direccion">Dirección:</Label>
             <Input
               id="direccion"
               value={form.direccion}
@@ -190,7 +190,7 @@ export default function Register() {
           </div>
           <div className="form-row">
             <div className="form-group">
-              <Label htmlFor="password">Contrasena:</Label>
+              <Label htmlFor="password">Contraseña:</Label>
 
               <Input
                 id="password"
@@ -208,7 +208,7 @@ export default function Register() {
               )}
             </div>
             <div className="form-group">
-              <Label htmlFor="confirm">Confirmar contrasena:</Label>
+              <Label htmlFor="confirm">Confirmar contraseña:</Label>
               <Input
                 id="confirm"
                 type="password"
@@ -227,13 +227,13 @@ export default function Register() {
           </div>
           <div className="register-footer" aria-busy={loading ? "true" : "false"}>
             <span className="login-link">
-              Ya tienes una cuenta?
+              ¿Ya tienes una cuenta?
               <Button
                 type="button"
                 className="link-button"
                 onClick={() => navigate("/")}
               >
-                Inicia sesion
+                Inicia sesión
               </Button>
             </span>
 

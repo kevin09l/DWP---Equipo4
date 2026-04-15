@@ -49,7 +49,7 @@ export default function Tips() {
           </div>
         ))}
 
-        {!tips.length && <p>No hay consejos publicados.</p>}
+        {!tips.length && <p className="no-data">No hay consejos publicados.</p>}
       </div>
     </div>
   );

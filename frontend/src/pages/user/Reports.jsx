@@ -106,13 +106,13 @@ export default function Reports() {
 
       <form className="reports-form" onSubmit={handleSubmit}>
         <div className="form-group">
-          <Label htmlFor="address">Dirección</Label>
+          <Label htmlFor="address">Dirección:</Label>
           <Input             
           id="address"
           value={address} 
           onChange={(e) => setAddress(e.target.value)} />
 
-          <Label htmlFor="priority" >Urgencia</Label>
+          <Label htmlFor="priority" >Urgencia:</Label>
           <select 
           id="priority"
           value={priority} 

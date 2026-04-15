@@ -44,7 +44,7 @@ export default function UserNavbar() {
             Iniciar sesion
           </NavLink>
         ) : (
-          <button onClick={logout} disabled={!isOnline}>
+          <button className="btn btn-primary" onClick={logout} disabled={!isOnline}>
             Cerrar sesion
           </button>
         )}

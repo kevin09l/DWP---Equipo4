@@ -33,13 +33,15 @@ export default function Home() {
         <div className="home-hero-content">
           <div className="home-left">
             <h1 tabIndex="-1">Sistema de Agua</h1>
-            <p>Consulta avisos, horarios y reporta problemas fácilmente</p>
+            <p className="card-text">Esta solución digital ha sido diseñada como un ecosistema centralizado para la administración eficiente del recurso hídrico, optimizando la comunicación entre el organismo operador y el usuario final. El sistema integra herramientas avanzadas de información y participación ciudadana para garantizar la continuidad y calidad del servicio.
+              Consulta avisos, horarios y reporta problemas fácilmente</p>
 
-            <button ref={buttonRef} className="home-btn">Iniciar sesión</button>
           </div>
 
           <div className="home-right">
-            <div className="home-image-placeholder"></div>
+            <div className="home-image-placeholder">      
+              <img src="/img/image.jpg" alt="Imagen" width="400" />            
+            </div>
           </div>
         </div>
       </section>

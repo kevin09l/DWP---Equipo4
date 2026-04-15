@@ -65,7 +65,7 @@ export default function Notifications() {
             </div>
           ))
         ) : (
-          <p>No hay avisos.</p>
+          <p className="no-data">No hay avisos.</p>
         )}
       </div>
     </div>

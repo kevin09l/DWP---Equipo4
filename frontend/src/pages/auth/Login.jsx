@@ -158,7 +158,7 @@ export default function Login() {
           )}
 
           <div className="form-group">
-            <Label htmlFor="usuario">Usuario:</Label>
+            <Label htmlFor="usuario">Correo electrónico:</Label>
             <Input
               ref={userRef}
               id="usuario"
@@ -184,7 +184,7 @@ export default function Login() {
           </div>
 
           <div className="form-group">
-            <Label htmlFor="password">Contrasena:</Label>
+            <Label htmlFor="password">Contraseña:</Label>
             <Input
               ref={passwordRef}
               id="password"
