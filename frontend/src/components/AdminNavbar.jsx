@@ -64,7 +64,7 @@ export default function AdminNavbar() {
           location.pathname.startsWith("/admin/users") ? "page" : undefined
         }
       >
-        Reportes
+        Usuarios
       </NavLink>
 
       <NavLink
